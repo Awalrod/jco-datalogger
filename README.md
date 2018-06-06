@@ -12,5 +12,5 @@ allows the datalogger to collect data from anywhere that the canbus socket is vi
 
 The Canopen jar is not yet available as open source code, due to my own lazyness.  If you are interesting in working with it, let me know.
 
-
+This fork is intended to implement livestreaming data
 

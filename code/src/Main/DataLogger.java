@@ -693,7 +693,12 @@ public class DataLogger
 		boolean bBitsSample = false;
 		String bitsSample;
 		private int rxPdoCtlMapIndex = 0x11;
-
+		boolean bStream = false;
+		boolean bStreamAddress = false;
+		boolean bStreamPort = false;
+		String streamAddress;
+		String streamPort;
+		
 		CoXmlHandler(CanOpenThread cot)
 		{
 			this.cot = cot;
@@ -710,6 +715,9 @@ public class DataLogger
 			}
 			else if(qName.equalsIgnoreCase("channels")) {
 				bChannels = true;
+			}
+			else if(qName.equalsIgnoreCase("stream")){
+				bStream = true;
 			}
 			else if(bDriver)
 			{
@@ -747,6 +755,15 @@ public class DataLogger
 					bNode = true;
 				}
 			}
+			else if(bStream)
+			{
+				if(qName.equalsIgnoreCase("address")){
+					bStreamAddress=true;
+				}
+				else if(qName.equalsIgnoreCase("port")){
+					bStreamPort=true;
+				}
+			}
 
 		}
 
@@ -775,6 +792,17 @@ public class DataLogger
 			}
 			else if(qName.equalsIgnoreCase("channels")) {
 				bChannels = false;
+			}
+			else if(qName.equalsIgnoreCase("stream"))
+			{
+				bStream = false;
+				try{
+					streamServer = new StreamServer(streamAddress,Integer.decode(streamPort));
+					streamServer.start();
+				}catch(Exception e){
+					System.out.println("Error starting websocket server");
+					e.printStackTrace();
+				}
 			}
 			else if(bDriver)
 			{
@@ -823,6 +851,15 @@ public class DataLogger
 					bChannels = false;
 				}
 			}
+			else if(bStream)
+			{
+				if(qName.equalsIgnoreCase("address")){
+					bStreamAddress = false;
+				}
+				else if(qName.equalsIgnoreCase("port")){
+					bStreamPort = false;
+				}	
+			}
 		}
 
 		@Override
@@ -850,6 +887,10 @@ public class DataLogger
 				numSamples = temp;
 			else if(bBitsSample)
 				bitsSample = temp;
+			else if(bStreamAddress)
+				streamAddress = temp;
+			else if(bStreamPort)
+				streamPort = temp;	
 		}
 	}	// end private class CoXmlHandler
 
@@ -1011,13 +1052,7 @@ public class DataLogger
 			fileHandler = new FileHandler();
 			
 			recordingStatus = false;
-			try{
-				streamServer = new StreamServer("192.168.1.105",5555);
-				streamServer.start();
-			}catch(Exception e){
-				System.out.println("Erro starting websocket server");
-				e.printStackTrace();
-			}
+			
 			
 			
 			

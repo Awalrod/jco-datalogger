@@ -103,7 +103,10 @@ public class StreamServer extends WebSocketServer {
 		for(WebSocket conn: streams){
 			try{conn.send(jsonText);}
 			catch(Exception e){
-				System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()+ "Couldn't send json message");
+				if(conn!=null){
+					//System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()+ "Couldn't send json message");
+						
+				}				
 				toRemove.add(conn);
 				e.printStackTrace();
 			}

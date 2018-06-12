@@ -14,3 +14,14 @@ The Canopen jar is not yet available as open source code, due to my own lazyness
 
 This fork is intended to implement livestreaming data
 
+## Notable Changes  
+The original jco-datalogger is
+[here](https://github.com/mpcrowe/jco-datalogger).  
+The data-logger app now starts a WebSocket server and streams data as it
+recieves it. The WebSocket implementation used can be found
+[here](https://github.com/TooTallNate/Java-WebSocket). The address and port
+of the server are set in the loggerconfig.xml file under the <stream> tag.
+Any other application can open a WebSocket at the correct address and
+recieve a stream of JSON data from the logger. An example written in
+javascript is included in
+[streamExample.html](jco-datalogger/code/streamExample.html).

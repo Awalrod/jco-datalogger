@@ -27,7 +27,11 @@ written in javascript using the [d3.js](https://d3js.org/) library for graphing.
 
 The JSON object sent is in the form:  
 `[{"x":0,"y":0,"z":0},{"x":-29362,"y":64095,"z":245445},{"x":-155975,"y":-84501,"z":185922},{"x":78515,"y":124510,"z":206242},{"x":0,"y":0,"z":0},{"x":0,"y":0,"z":0},{"x":0,"y":0,"z":0}]`  
-The first dataset being the lowest nodeId and the last being the highest.  
+The first dataset being the lowest nodeId and the last being the highest. To
+configure how many nodes are on the network, edit 
+[loggerconfig.xml](jco-datalogger/code/loggerconfig.xml). Extra nodes that
+aren't physically connected will show up as `{"x":0,"y":0,"z":0}` in the
+data stream.
 
 
 

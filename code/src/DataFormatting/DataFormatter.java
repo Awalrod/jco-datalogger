@@ -12,6 +12,8 @@ import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.text.SimpleDateFormat;
 import java.io.File;
+
+import com.google.gson.*;
 /**
  * Created by gcdc on 6/7/17.
  */
@@ -178,5 +180,13 @@ public class DataFormatter
 		}
 		return output;
 	}
+	
+	public static String produceJsonString(AccelerometerReading[] readings){
+		String jsonString;
+		Gson gson = new Gson();
+		jsonString = gson.toJson(readings);
+		return jsonString;	
+	}
+	
 
 }

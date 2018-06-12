@@ -64,7 +64,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-
+import Server.StreamServer;
 /**
  * Created by gcdc on 6/7/17.
  */
@@ -84,7 +84,9 @@ public class DataLogger
 	private String[] args;
 	private boolean recordingStatus;
 	private ReadableInstant startInstant;
-
+	
+	private StreamServer streamServer;
+	private ConstantListener cl;
 	//Weird args4j stuff here
 	@Option(name="-l",aliases={"--length"},usage="Maximum number of sample lines per data file",forbids={"-i"})
 	private Integer fileLength = 1000;
@@ -163,7 +165,7 @@ public class DataLogger
 		* Creates new file if needed
 		* Gets the latest sample from the NodeListeners
 		* Closes file and clears the per-file start time if file size is reached
-		* @param canMessage - The Sync message, supplied by CanOpen. Currently unused
+		* @param canMessage - The Sync message, supplied by CanOpen. 
 		*/
 		public void onMessage(CanMessage canMessage)
 		{
@@ -196,6 +198,7 @@ public class DataLogger
 //				long nanoFmtStart = System.nanoTime();
 				String formattedLine = dfmt.produceOutputLine(elapsedTimeNs, readings);
 //				long nanoDone = System.nanoTime();
+				
 				if(toStdout)
 				{
 					System.out.println(formattedLine);
@@ -227,6 +230,7 @@ public class DataLogger
 					}
 				}
 			}
+			
 		}
 
 		public void onObjDictChange(SubEntry se) {}
@@ -250,6 +254,41 @@ public class DataLogger
 			}
 		}
 	}
+	
+	//This is for the stream
+	private class ConstantListener implements CanOpenListener{
+		public void onMessage(CanMessage canMeassage){
+			AccelerometerReading readings[] = new AccelerometerReading[nodes.size()];
+			for(int i=0; i<nodes.size(); i++ )
+			{
+				readings[i] = nodes.get(i).getLatestReading();
+			}
+			//debugPrint(dfmt.produceJsonString(readings));
+			streamServer.stream(dfmt.produceJsonString(readings));
+		}
+		public void onObjDictChange(SubEntry se){}
+		public void onEvent(CanOpen canOpen){
+			/*if(canOpen.isResetNodeState())
+			{
+				stopSyncListener();
+			}else if(canOpen.isOperationalState())
+			{
+				startSyncListener();
+			}*/
+		}
+		
+		public void startSyncListener()
+		{
+			canOpen.addSyncListener(this);
+			debugPrint("Starting Sync Listener for Stream");
+			
+		}
+		public void stopSyncListener()
+		{
+			canOpen.removeSyncListener(this);
+		}
+	}
+	
 
 
 	private class FileHandler
@@ -837,6 +876,7 @@ public class DataLogger
 				saxParser.parse(fXmlFile, handler);
 
 				canOpen.addEventListener(coListener);
+				cl = new ConstantListener();
 
 				debugPrint("CanOpen configured");
 			}
@@ -874,6 +914,7 @@ public class DataLogger
 					{
 						coListener.startSyncListener();
 					}
+					cl.startSyncListener();
 					canOpen.join();
 					debugPrint("CanOpenThread.run(): canOpen.start() is finished");
 				}
@@ -968,8 +1009,18 @@ public class DataLogger
 			dfmt.setTitle("http://www.gcdataconcepts.com, Datalogger");
 			dfmt.setSampleRate("fixeme, Hz");
 			fileHandler = new FileHandler();
-
+			
 			recordingStatus = false;
+			try{
+				streamServer = new StreamServer("192.168.1.105",5555);
+				streamServer.start();
+			}catch(Exception e){
+				System.out.println("Erro starting websocket server");
+				e.printStackTrace();
+			}
+			
+			
+			
 			try
 			{
 				if( xmlFileName != null)
@@ -987,6 +1038,7 @@ public class DataLogger
 			}
 
 			coThread.start();
+			
 			try
 			{
 				socketThread.join();
@@ -996,6 +1048,9 @@ public class DataLogger
 				ie.printStackTrace();
 			}
 		}
+		
+		
+		
 	}
 
 

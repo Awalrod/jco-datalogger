@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Canopen data recorder</title>
+		<style type="text/css" media="screen">
+			* {
+				margin: 0px 0px 0px 0px;
+				padding: 0px 0px 0px 0px;
+			}
+
+			body, html {
+				padding: 3px 3px 3px 3px;
+				background-color: #D8DBE2;
+				font-family: Verdana, sans-serif;
+				font-size: 12pt;
+				text-align: center;
+			}
+			.graph .axis {
+			    stroke-width: 1;
+			}
+
+			.graph .axis .tick line {
+			    stroke: black;
+			}
+
+			.graph .axis .tick text {
+			    fill: black;
+			    font-size: 0.7em;
+			}
+
+			.graph .axis .domain {
+			    fill: none;
+			    stroke: black;
+			}
+			
+			.graph .group {
+			    fill: none;
+			    stroke: black;
+			    stroke-width: 1.5;
+			}
+			
+			
+
+			div.graph {
+				display:inline-block;
+				margin-top:10px;
+			}
+			
+			div.ctrl_panel{
+				display:inline-block;
+				float:left;
+				padding:5px;
+			}
+			
+			.ctrl_element{
+				margin:5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="ctrl_panel">
+			<button class="ctrl_element" onclick="streamToggle()">Toggle Stream</button>
+			
+			<form class="ctrl_element" name="form2" >
+				<select name="nodemenu"
+				onChange="changeNode(document.form2.nodemenu.options[document.form2.nodemenu.options.selectedIndex].value)">
+				<option>Select Node</option>
+				<option value=1>Node 1</option>
+				<option value=2>Node 2</option>
+				<option value=3>Node 3</option>
+				<option value=4>Node 4</option>
+				<option value=5>Node 5</option>
+				<option value=6>Node 6</option>
+				<option value=8>Node 7</option>
+				</select>
+			</form>
+		</div>
+		<div class="graph"></div>
+		
+		
+		
+
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="fft.js"></script>
+        <script>
+		function streamToggle(){
+			if(isStreaming){
+				isStreaming = false;
+				socket.send("stream?=false");
+			}else{
+				isStreaming = true;
+				socket.send("stream?=true");
+			}
+		}	
+		</script>
+		<script>
+		function changeNode(nodeNum){
+			nodeId=nodeNum-1
+			socket.send("nodeid?="+nodeId)
+		}
+		</script>	
+        <script>
+        	
+		var 	limit = 600,
+			duration = 100, 
+			now = new Date(Date.now())
+			then = now-(limit-2)*duration;
+		   /*
+			Duration should be roughly 1000/(samplerate)
+			limit is how many durations are visible on the graph
+			Page becomes unresponsive if the limit is too high
+			Both need to be made dynamic
+		   */ 
+		
+			
+		var 	width = 700,
+			height = 400
+
+		var Node = {
+			x: {
+				value: 0,
+				color: 'orange',
+				data: d3.range(limit).map(function(d,i) {
+					return [i,i] //[f,?]
+				})
+			},
+			y: {
+				value: 0,
+				color: 'green',
+				data: d3.range(limit).map(function() {
+					return [0,0]
+				})
+			},
+			z: {
+				value: 0,
+				color: 'grey',
+				data: d3.range(limit).map(function() {
+					return [0,0]
+				})
+			}
+		}
+
+		var x = d3.scale.linear()
+			.domain([0,100])
+			.range([0, width])
+
+		var y = d3.scale.linear()
+			.domain([0, 1000000])
+			.range([height, 0])
+
+		var line = d3.svg.line()
+			//.interpolate('basis')
+			.x(function(d, i) {
+				return x(d[0])
+			})
+			.y(function(d) {
+				return y(d[1])
+			})
+
+		var svg = d3.select('.graph').append('svg')
+			.attr('class', 'chart')
+			.attr('width', width+50)
+			.attr('height', height + 100)
+
+		var xaxis = svg.append('g')
+			.attr('class', 'x axis')
+			.attr('transform', 'translate(0,' + height + ')')
+			.call(x.axis = d3.svg.axis().scale(x).orient('bottom'))
+		var yaxis = svg.append('g')
+			.attr('class','y axis')
+			.call(y.axis = d3.svg.axis().scale(y).orient('right'))
+			
+		var paths = svg.append('g')
+		
+		for (var name in Node) {
+			var group = Node[name]
+			group.path = paths.append('path')
+				.data([group.data])
+				.attr('class', name + ' group')
+				.style('stroke', group.color)
+		}
+		
+		
+		
+		var isStreaming = false;
+		var socket = new WebSocket("ws://192.168.1.57:5555")
+	/*	setTimeout(function(){
+			socket.send("stream?=true");
+		},1000);*/
+		lastDate = new Date()
+		nodeId = 0
+		var xList=[], yList=[], zList = [];
+		var desiredSize = 128; //powers of 2 work better???
+		
+		var difs = new Array(desiredSize/4)//rolling average
+		
+		socket.onmessage = function(event){
+			now = new Date()
+			var dif = now-lastDate
+			//console.log(dif)
+			lastDate = now
+			//console.log(event.data);
+			var sensorData = JSON.parse(event.data)
+			//console.log(sensorData)
+			xList.push(sensorData.x)
+			yList.push(sensorData.y)
+			zList.push(sensorData.z)
+			difs.push(dif)
+			difs.shift()
+			//console.log(difs)
+			if(xList.length==desiredSize){
+				var imag = new Array(desiredSize).fill(0).map(function(){
+					return 0;
+				})
+				var sr=0;
+				for(var d in difs){
+					sr = sr+ difs[d]
+				}
+				sr = sr/difs.length
+				sr = 1000/sr
+				f_axis = new Array(desiredSize/2).fill(0).map(function(d,i) {return i*(sr/2)/(desiredSize/2)})
+				//console.log(xList)
+				//console.log(imag)
+				var x_fft = xList.slice()
+				//console.log(x_fft)
+				transform(x_fft,imag.slice())
+				//console.log(x_fft)
+				//console.log(imag)
+				var x_mod = x_fft.map(function(d){
+					return Math.abs(d)
+				})
+				var x_mod_half = x_mod.slice(0,x_mod.length/2)
+				//console.log(x_mod_half)
+
+				x_zipped = f_axis.map(function(d,i){
+					return [d,x_mod_half[i]]
+				})
+				
+				
+				var y_fft = yList.slice()
+				transform(y_fft,imag.slice())
+				var y_mod = y_fft.map(function(d){
+					return Math.abs(d)
+				})
+				var y_mod_half = y_mod.slice(0,y_mod.length/2)
+
+				y_zipped = f_axis.map(function(d,i){
+					return [d,y_mod_half[i]]
+				})
+				
+				
+				var z_fft = zList.slice()
+				transform(z_fft,imag.slice())
+				var z_mod = z_fft.map(function(d){
+					return Math.abs(d)
+				})
+				var z_mod_half = z_mod.slice(0,z_mod.length/2)
+
+				z_zipped = f_axis.map(function(d,i){
+					return [d,z_mod_half[i]]
+				})
+				
+				
+				
+				
+				
+
+				Node.x.path.data([x_zipped])
+				Node.x.path.attr('d',line)
+				Node.y.path.data([y_zipped])
+				Node.y.path.attr('d',line)
+				Node.z.path.data([z_zipped])
+				Node.z.path.attr('d',line)
+				
+				x.domain([0,f_axis[f_axis.length-1]])	
+				xaxis.transition()
+					.duration(100)
+					.ease("linear")
+					.call(x.axis)
+				xList = []
+				zList = []
+				yList = []
+			}
+			
+			//console.log(sensorData.x)
+			/*for (var name in Node) {
+				var group = Node[name]
+~				group.data.push([now,sensorData[name]])
+				group.path.attr('d', line) // 'd' for draw
+			
+			}
+			
+			// Shift domain
+			//x.domain([now - (limit - 2) * duration, now - duration])
+			x.domain([Node.x.data[0][0],now-dif]);
+			
+			// Slide x-axis left
+			xaxis.transition()
+			.duration(dif)
+			.ease('linear')
+			.call(x.axis)
+
+			// Remove oldest data point from each group
+			for (var name in Node) {
+				var group = Node[name]
+				group.data.shift()
+			}
+			*/
+			
+		};       
+        </script>
+	</body>
+</html>
+

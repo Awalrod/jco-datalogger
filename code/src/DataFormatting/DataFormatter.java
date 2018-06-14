@@ -187,6 +187,12 @@ public class DataFormatter
 		jsonString = gson.toJson(readings);
 		return jsonString;	
 	}
+	public static String produceJsonString(AccelerometerReading reading){
+		String jsonString;
+		Gson gson = new Gson();
+		jsonString = gson.toJson(reading);
+		return jsonString;
+	}
 	
 
 }

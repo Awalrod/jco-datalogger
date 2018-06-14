@@ -2,7 +2,7 @@
 <config>
 	<can_driver>
 		<type>datagram</type>
-		<address>192.168.1.105</address>
+		<address>192.168.1.57</address>
 		<port>2000</port>
 	</can_driver>
 	<canopen_address>0x23</canopen_address>
@@ -58,7 +58,7 @@
 		</node>			
 	</channels>
 	<stream>
-		<address>192.168.1.105</address>
+		<address>192.168.1.57</address>
 		<port>5555</port>
 	</stream>	
 </config>

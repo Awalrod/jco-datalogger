@@ -264,7 +264,7 @@ public class DataLogger
 				readings[i] = nodes.get(i).getLatestReading();
 			}
 			//debugPrint(dfmt.produceJsonString(readings));
-			streamServer.stream(dfmt.produceJsonString(readings));
+			streamServer.stream(readings);
 		}
 		public void onObjDictChange(SubEntry se){}
 		public void onEvent(CanOpen canOpen){
@@ -1036,7 +1036,7 @@ public class DataLogger
 				ioe.printStackTrace();
 			}
 		}
-		else
+
 		{
 			socketListener = new SocketListener();
 			socketThread = new Thread(socketListener);

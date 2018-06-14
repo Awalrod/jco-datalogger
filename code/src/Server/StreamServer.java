@@ -19,14 +19,18 @@ import com.gcdc.canopen.CanOpenListener;
 import com.gcdc.can.CanMessage;
 import com.gcdc.canopen.SubEntry;
 
+import DataRecording.AccelerometerReading;
+import DataFormatting.DataFormatter;
+
 /**
  * A simple WebSocketServer implementation. Keeps track of a "chatroom".
  */
 public class StreamServer extends WebSocketServer {
 	
 	//WebSocket currentConnection;
-	ArrayList<WebSocket> streams = new ArrayList<WebSocket>();
-	
+//	ArrayList<WebSocket> streams = new ArrayList<WebSocket>();
+	ArrayList<Streamer> streams = new ArrayList<Streamer>();
+
 	public StreamServer( int port ) throws UnknownHostException {
 		super( new InetSocketAddress( port ) );
 		
@@ -43,24 +47,42 @@ public class StreamServer extends WebSocketServer {
 
 	@Override
 	public void onOpen( WebSocket conn, ClientHandshake handshake ) {
-		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected" );	
+		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected" );
+		synchronized(streams){streams.add(new Streamer(conn,0));}	
 	}
 
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
-		System.out.println( conn + " has left" );
+		System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()  + " has left" );
+		Streamer toRemove;
+		toRemove = getStreamByConn(conn);
+		if(toRemove !=null){
+			synchronized(streams){streams.remove(toRemove);}
+		}
 	}
 
 	@Override //from WebSocketServer
 	public void onMessage( WebSocket conn, String message ) {
 		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + message );
+		if(message.contains("nodeid?=")){
+			if(message.contains("all")){
+				getStreamByConn(conn).setStreamAll(true);
+			}else{
+				Integer nodeId = Integer.decode(message.substring(8));
+				getStreamByConn(conn).setNodeId(nodeId);
+				getStreamByConn(conn).setStreamAll(false);
+			}
+		}else{
 		switch(message){
 			case "stream?=true":
-				streams.add(conn);
+				getStreamByConn(conn).setStreaming(true);
 				break;
 			case "stream?=false":
-				streams.remove(conn);
+				getStreamByConn(conn).setStreaming(false);
 				break;
+			default:
+			
+				break;	
 		}
 	}
 	@Override
@@ -97,16 +119,21 @@ public class StreamServer extends WebSocketServer {
 		System.out.println("Server started!");
 	}
 	
-	public void stream(String jsonText){
+	public void stream(AccelerometerReading readings[]){
+		synchronized(streams){
+			for(Streamer s: streams){
+				s.stream(readings);
+			}
+		}	
+	}
+	
+/*	public void stream(String jsonText){
 		//System.out.println(isStreaming);
 		ArrayList<WebSocket> toRemove = new ArrayList<WebSocket>();
+		
 		for(WebSocket conn: streams){
 			try{conn.send(jsonText);}
 			catch(Exception e){
-				if(conn!=null){
-					//System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()+ "Couldn't send json message");
-						
-				}				
 				toRemove.add(conn);
 				e.printStackTrace();
 			}
@@ -114,6 +141,17 @@ public class StreamServer extends WebSocketServer {
 		for(WebSocket conn: toRemove){
 			streams.remove(conn);
 		}		
+	}
+*/	
+	public Streamer getStreamByConn(WebSocket conn){
+		synchronized(streams){
+			for(Streamer s: streams){
+				if(conn == s.conn){
+					return s;
+				}
+			}
+		}
+		return null;
 	}
 	
 	

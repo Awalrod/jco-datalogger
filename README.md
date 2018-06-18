@@ -48,6 +48,25 @@ sits on port 7331. Here are valid commands:
 + `numSamples=$sampleSize\n`: Sets the number of samples(lines after header info) in each .csv file, where `$sampleSize` is the desired amount.
 + `fileName=$fileName\n`: Sets the base file name for the .csv files. The logger will append three digits (`000`,`001`,etc) at the end of each file as new files are created.  
 + `clearData=\n`: Deletes any .csv files in the set data directory. Be careful when using this. The data directory is set with the `-dir` option at startup. 
+
+The Busmaster sits at 7332 and accepts verbose commands to change the object
+dictionary. Example of changing the sample rate:
+`<?xml version="1.0" encodeing="UTF-8'?>  
+<config>  
+	<slave_nodes>  
+		<node id="local">  
+			<nodeid>local</nodeid>  
+			<obj_dict>  
+				<index>0x1006</index>  
+				<subindex>0</subindex>  
+				<type>int32</type>  
+				<val>$val</val>  
+			</obj_dict>  
+		</node>  
+	</slave_nodes>  
+</config>`  
+Where `$val` is the desired time interval between samples in microseconds
+
 ## Other Repositories:
 The original jco-datalogger can be found 
 [here](https://github.com/mpcrowe/jco-datalogger).  

@@ -34,7 +34,20 @@ aren't physically connected will show up as `{"x":0,"y":0,"z":0}` in the
 data stream.
 
 
-
+## API  
+Currently the controller for the data recorder portion of the application
+sits on port 7331. Here are valid commands:  
++ `recording=start\n`: Starts recording .csv files.  
++ `recording=stop\n`: Stops recording .csv files.
++ `status\n`: Returns a brief status message that includes:  
+	Recording/Not Recording  
+	Samples per file  
+	Base Filename  
+	Start time (if recording)  
+	Runtime (if recording)  
++ `numSamples=$sampleSize\n`: Sets the number of samples(lines after header info) in each .csv file, where `$sampleSize` is the desired amount.
++ `fileName=$fileName\n`: Sets the base file name for the .csv files. The logger will append three digits (`000`,`001`,etc) at the end of each file as new files are created.  
++ `clearData=\n`: Deletes any .csv files in the set data directory. Be careful when using this. The data directory is set with the `-dir` option at startup. 
 ## Other Repositories:
 The original jco-datalogger can be found 
 [here](https://github.com/mpcrowe/jco-datalogger).  

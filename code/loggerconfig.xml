@@ -57,6 +57,10 @@
 			<bits_sample>20</bits_sample>
 		</node>			
 	</channels>
+	<controller>
+		<address>192.168.1.57</address>
+		<port>7331</port>
+	</controller>
 	<stream>
 		<address>192.168.1.57</address>
 		<port>5555</port>

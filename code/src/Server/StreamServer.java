@@ -73,16 +73,17 @@ public class StreamServer extends WebSocketServer {
 				getStreamByConn(conn).setStreamAll(false);
 			}
 		}else{
-		switch(message){
-			case "stream?=true":
-				getStreamByConn(conn).setStreaming(true);
-				break;
-			case "stream?=false":
-				getStreamByConn(conn).setStreaming(false);
-				break;
-			default:
-			
-				break;	
+			switch(message){
+				case "stream?=true":
+					getStreamByConn(conn).setStreaming(true);
+					break;
+				case "stream?=false":
+					getStreamByConn(conn).setStreaming(false);
+					break;
+				default:
+				
+					break;	
+			}
 		}
 	}
 	@Override

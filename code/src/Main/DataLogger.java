@@ -94,7 +94,7 @@ public class DataLogger
 	private ConstantListener cl;
 	
 	private Controller controller;
-	private ControllerServer controllerServer;
+	public ControllerServer controllerServer;
 	//Weird args4j stuff here
 	@Option(name="-l",aliases={"--length"},usage="Maximum number of sample lines per data file",forbids={"-i"})
 	public Integer fileLength = 1000;
@@ -814,6 +814,9 @@ public class DataLogger
 		boolean bControllerPort = false;
 		String controllerAddress;
 		String controllerPort;	
+		boolean bBusMasterPort;
+		String busMasterPort;
+		
 		CoXmlHandler(CanOpenThread cot)
 		{
 			this.cot = cot;
@@ -887,6 +890,8 @@ public class DataLogger
 					bControllerAddress = true;
 				}else if(qName.equalsIgnoreCase("port")){
 					bControllerPort = true;
+				}else if(qName.equalsIgnoreCase("busmasterport")){
+					bBusMasterPort=true;
 				}
 			}
 
@@ -932,6 +937,7 @@ public class DataLogger
 			else if(qName.equalsIgnoreCase("controller")){
 				bController = false;
 				try{
+					controller.setBusMasterPort(Integer.decode(busMasterPort));
 					controllerServer = new ControllerServer(controllerAddress,Integer.decode(controllerPort),controller);
 					controllerServer.start();
 				}catch(Exception e){
@@ -999,6 +1005,8 @@ public class DataLogger
 					bControllerAddress = false;
 				}else if(qName.equalsIgnoreCase("port")){
 					bControllerPort = false;
+				}else if(qName.equalsIgnoreCase("busmasterport")){
+					bBusMasterPort = false;
 				}
 			}
 		}
@@ -1036,6 +1044,8 @@ public class DataLogger
 				controllerAddress = temp;
 			else if(bControllerPort)
 				controllerPort = temp;	
+			else if(bBusMasterPort)
+				busMasterPort = temp;
 		}
 	}	// end private class CoXmlHandler
 

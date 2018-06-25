@@ -8,6 +8,10 @@ public class Controller{
     public Controller(DataLogger dInstance){
         dataLogger = dInstance;    
     }
+    public void setBusMasterPort(int port){
+        busmasterPort = port;
+    }
+
     public void setSampleSize(int sampleSize){
         dataLogger.fileLength = sampleSize;    
     }

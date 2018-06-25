@@ -60,9 +60,10 @@
 	<controller>
 		<address>192.168.1.57</address>
 		<port>7331</port>
+		<busmasterport>7332</busmasterport>
 	</controller>
 	<stream>
 		<address>192.168.1.57</address>
-		<port>5555</port>
+		<port>7333</port>
 	</stream>	
 </config>

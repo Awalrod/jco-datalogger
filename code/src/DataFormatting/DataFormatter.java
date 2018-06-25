@@ -193,6 +193,12 @@ public class DataFormatter
 		jsonString = gson.toJson(reading);
 		return jsonString;
 	}
+	public static String produceJsonString(String[][] stringList){
+		String jsonString;
+		Gson gson = new Gson();
+		jsonString = gson.toJson(stringList);
+		return jsonString;
+	}
 	
 
 }

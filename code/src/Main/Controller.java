@@ -53,5 +53,10 @@ public class Controller{
             e.printStackTrace();
         }
     }     
-    
+    public String getFileDetails(){
+        return dataLogger.detailedFileList();
+    }
+    public void clearData(){
+        dataLogger.clearData();
+    }    
 }

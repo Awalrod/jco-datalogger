@@ -20,7 +20,16 @@ public class ControllerServer extends WebSocketServer{
     
     @Override
     public void onMessage(WebSocket conn, String message){
-        processMessage(message);
+        //no splits
+        if(message.equalsIgnoreCase("fileRequest")){
+            String jsonText = controller.getFileDetails();
+            conn.send("{\"fileList\": "+jsonText+"}");
+        }else if(message.equalsIgnoreCase("clearData")){
+           controller.clearData(); 
+        }
+        else{//split
+            processMessage(message);
+        }
     }
     
     private String processMessage(String message){
@@ -40,7 +49,7 @@ public class ControllerServer extends WebSocketServer{
                 case "clearData":
             return clearData();*/
         default:
-        return ("ERROR: Unknown message");
+            return ("ERROR: Unknown message");
         }
     }
     private String setSampleRate(String message){

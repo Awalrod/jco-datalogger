@@ -15,6 +15,8 @@ import com.gcdc.canopen.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.IOException;
@@ -23,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileReader;
-import java.io.LineNumberReader;
 import java.io.PrintWriter;
 
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.DirectoryNotEmptyException;
 
-import java.util.Set;	// for Set
+import java.util.Set;	
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.ArrayList;
@@ -81,7 +82,7 @@ public class DataLogger
 	private ArrayList<NodeTracker> nodes;
 
 	private DataFormatter dfmt;
-	private FileHandler fileHandler;
+	public FileHandler fileHandler;
 	private Timer shutdownTimer;
 	private SocketListener socketListener;
 	private Thread socketThread;
@@ -140,6 +141,15 @@ public class DataLogger
 	public void stopSyncListener(){
 		coListener.stopSyncListener();
 	}
+	public String detailedFileList(){
+		return fileHandler.detailedFileList();
+	}
+	public void clearData(){
+		fileHandler.clearDirectory();
+	}
+	
+	
+	
 	private class COListener implements CanOpenListener
 	{
 		long elapsedTimeNs = 0;
@@ -351,7 +361,92 @@ public class DataLogger
 			currentFileNumber = 0;
 			return "Success";
 		}
+		/*
+		 * Retrieve a list of .csv files in the data directory 
+		 */
+		public String[] fileList(){
+			ArrayList<String> dataFiles = new ArrayList<String>();
+			Path dir  = Paths.get(directory);
+			try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
+				for(Path file : stream){
+					if(file.toString().endsWith(".csv")){
+						dataFiles.add(file.toString());
+					}		
+				}		
+			}catch(Exception e){
+				debugPrint("error retrieving filelist");
+				e.printStackTrace();
+			}		
+			return dataFiles.toArray(new String [0]);					
+		}
+		
+		/*
+		 * Retrieve a detailed file list including time, sample size, and file size. In a  JSON string
+		 */
+		 public String detailedFileList(){
+			ArrayList<String[]> dataFiles = new ArrayList<String[]>();
+			Path dir  = Paths.get(directory);
+			try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
+				for(Path file : stream){
+					if(file.toString().endsWith(".csv")){
+						String[] jFile = new String[4]; //[name,time,sample size,size bytes]
+						jFile[0] = file.getFileName().toString();
+						jFile[1] = Files.getLastModifiedTime(file).toString();
+						jFile[2] = Integer.toString(countLines(file.toString())-6);
+						jFile[3] = Long.toString(Files.size(file));
+						if(Files.size(file)!=0){//file is still being written if size==0
+							dataFiles.add(jFile);
+						}
+					}		
+				}		
+			}catch(Exception e){
+				debugPrint("error retrieving filelist");
+				e.printStackTrace();
+			}		
+			String d[][] =  dataFiles.toArray(new String[0][0]);
+			return dfmt.produceJsonString(d);							 	
+		 }
+		
+		//Stole this from the internet
+		//Supposed to be zippy
+		private int countLines(String filename)throws IOException{
+			InputStream is = new BufferedInputStream(new FileInputStream(filename));
+			try {
+				byte[] c = new byte[1024];
 
+				int readChars = is.read(c);
+				if (readChars == -1) {
+					// bail out if nothing to read
+					return 0;
+				}
+
+				// make it easy for the optimizer to tune this loop
+				int count = 0;
+				while (readChars == 1024) {
+					for (int i=0; i<1024;) {
+						if (c[i++] == '\n') {
+							++count;
+						}
+					}
+					readChars = is.read(c);
+				}
+
+				// count remaining characters
+				while (readChars != -1) {
+					for (int i=0; i<readChars; ++i) {
+						if (c[i] == '\n') {
+							++count;
+						}
+					}
+					readChars = is.read(c);
+				}
+
+				return count == 0 ? 1 : count;
+			} finally {
+				is.close();
+			}		
+		}
+		
 		//Creates a new data file and resets or increments relevant variables
 		public void createFile()
 		{

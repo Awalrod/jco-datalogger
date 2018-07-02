@@ -19,6 +19,15 @@ public class ControllerServer extends WebSocketServer{
     }
     
     @Override
+    public void onOpen(WebSocket conn, ClientHandshake handshake){
+        if(controller.getRecordingStatus()){
+           conn.send("{\"recordingStatus\":true}"); 
+        }else{
+           conn.send("{\"recordingStatus\":false}"); 
+        }    
+        
+    }
+    @Override
     public void onMessage(WebSocket conn, String message){
         //no splits
         if(message.equalsIgnoreCase("fileRequest")){
@@ -52,6 +61,10 @@ public class ControllerServer extends WebSocketServer{
             return ("ERROR: Unknown message");
         }
     }
+    public void pushFiles(){
+        String jsonText = controller.getFileDetails();
+        broadcast("{\"fileList\": "+jsonText+"}");    //Sends fileList to all connections
+    }
     private String setSampleRate(String message){
         int sampleRate = Integer.parseInt(message.split("=")[1]);
         controller.setSampleRate(sampleRate);
@@ -76,14 +89,14 @@ public class ControllerServer extends WebSocketServer{
         }
         return toState;
     }
-    
     private String setBaseName(String message){
         String baseName = message.split("=")[1];
         controller.setBaseName(baseName);
         return baseName;
     }
-    @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake){}
+    
+    
+    
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote){}
     @Override

@@ -62,5 +62,8 @@ public class Controller{
     }
     public void clearData(){
         dataLogger.clearData();
+    }
+    public boolean getRecordingStatus(){
+        return dataLogger.recordingStatus;
     }    
 }

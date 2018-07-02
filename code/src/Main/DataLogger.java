@@ -87,7 +87,7 @@ public class DataLogger
 	private SocketListener socketListener;
 	private Thread socketThread;
 	private String[] args;
-	private boolean recordingStatus;
+	public boolean recordingStatus;
 	private ReadableInstant startInstant;
 	
 	private StreamServer streamServer;
@@ -361,17 +361,31 @@ public class DataLogger
 			currentFileNumber = 0;
 			return "Success";
 		}
+		
+		private Path[] getFiles(){
+			ArrayList<Path> files = new ArrayList<Path>();
+			Path dir = Paths.get(directory);
+			try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
+				for(Path file : stream){
+					if(file.toString().endsWith(".csv")){
+						files.add(file);
+					}		
+				}		
+			}catch(Exception e){
+				debugPrint("error retrieving filelist");
+				e.printStackTrace();
+			}
+			return files.toArray(new Path[files.size()]);
+		}
 		/*
 		 * Retrieve a list of .csv files in the data directory 
 		 */
 		public String[] fileList(){
 			ArrayList<String> dataFiles = new ArrayList<String>();
-			Path dir  = Paths.get(directory);
-			try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
-				for(Path file : stream){
-					if(file.toString().endsWith(".csv")){
-						dataFiles.add(file.toString());
-					}		
+			try{
+				Path[] files = getFiles();
+				for(Path file : files){
+					dataFiles.add(file.toString());
 				}		
 			}catch(Exception e){
 				debugPrint("error retrieving filelist");
@@ -385,8 +399,23 @@ public class DataLogger
 		 */
 		 public String detailedFileList(){
 			ArrayList<String[]> dataFiles = new ArrayList<String[]>();
-			Path dir  = Paths.get(directory);
-			try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
+			Path[] files = getFiles();
+			try{
+				for(Path file : files){
+					String[] jFile = new String[4]; //[name,time,sample size,size bytes]
+					jFile[0] = file.getFileName().toString();
+					jFile[1] = Files.getLastModifiedTime(file).toString();
+					jFile[2] = Integer.toString(countLines(file.toString())-6);
+					jFile[3] = Long.toString(Files.size(file));
+					if(Files.size(file)!=0){//file is still being written if size==0
+						dataFiles.add(jFile);
+					}
+				}
+			}catch(IOException ioe){
+				debugPrint("Error creating detailed File List");
+				ioe.printStackTrace();
+			}
+			/*try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
 				for(Path file : stream){
 					if(file.toString().endsWith(".csv")){
 						String[] jFile = new String[4]; //[name,time,sample size,size bytes]
@@ -402,7 +431,7 @@ public class DataLogger
 			}catch(Exception e){
 				debugPrint("error retrieving filelist");
 				e.printStackTrace();
-			}		
+			}*/		
 			String d[][] =  dataFiles.toArray(new String[0][0]);
 			return dfmt.produceJsonString(d);							 	
 		 }
@@ -469,6 +498,7 @@ public class DataLogger
 				}
 				currentSampleSize = 0;
 				currentFileNumber++;
+				controllerServer.pushFiles();
 			}
 		}
 

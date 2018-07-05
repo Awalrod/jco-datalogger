@@ -65,5 +65,8 @@ public class Controller{
     }
     public boolean getRecordingStatus(){
         return dataLogger.recordingStatus;
+    }
+    public String createZip(){
+        return dataLogger.createZip();
     }    
 }

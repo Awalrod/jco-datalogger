@@ -35,6 +35,9 @@ public class ControllerServer extends WebSocketServer{
             conn.send("{\"fileList\": "+jsonText+"}");
         }else if(message.equalsIgnoreCase("clearData")){
            controller.clearData(); 
+        }else if(message.equalsIgnoreCase("zipRequest")){
+            String zipName = controller.createZip();
+            conn.send("{\"zipCreated\":\""+zipName+"\"}");
         }
         else{//split
             processMessage(message);
@@ -94,6 +97,7 @@ public class ControllerServer extends WebSocketServer{
         controller.setBaseName(baseName);
         return baseName;
     }
+    
     
     
     

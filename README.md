@@ -38,29 +38,28 @@ data stream.
 ## Startup Options
 Options:
 
--a      Sets the IF socat address.
-        default: None(REQUIRED)
-        alias: --address
-        example: java -jar can-0v1.jar -a '10.10.3.1'
++ `-a`      Sets the IF socat address.  
+        default: None(REQUIRED)  
+        alias: --address  
+        example: java -jar can-0v1.jar -a '10.10.3.1'  
 
--b      Sets the base name for the data files. The resulting 
-        filename will be [base-name][nnn].csv. [nnn] is the nth 
-        data file created in this specific session. Note that 
-        can-0v1 will overwrite files with the same name.
-        default: DATA_
-        alias: --base-name
-        example: java -jar can-0v1.jar  -a [address] -b Experiment_
++ `-b`      Sets the base name for the data files. The resulting
+        filename will be [base-name][nnn].csv. [nnn] is the nth
+        data file created in this specific session. Note that   
+        can-0v1 will overwrite files with the same name.  
+        default: DATA_  
+        alias: --base-name  
+        example: java -jar can-0v1.jar  -a [address] -b Experiment_  
 
--d      Enables debugging statements. These include various
-        status updates and output to the data files
-        default: off
-        alias: --debug
-        example: java -jar can-0v1.jar  -a [address] -d
++ `-d`     Enables debugging statements. These include various  
+        status updates and output to the data files  
+        default: off  
+        alias: --debug  
+        example: java -jar can-0v1.jar  -a [address] -d  
 
--dir    Sets the directory in which the data files will be 
-        placed. 
-        IMPORTANT: This is also the directory that the cgi-bin
-                interface will clear when commanded to. If you set a 
++ `-dir`    Sets the directory in which the data files will be placed.   
+        IMPORTANT: This is also the directory that the cgi-bin  
+                interface will clear when commanded to. If you set a   
                 directory besides /var/www/html/data be sure you are careful 
                 when clearing it. Make sure there are no .csv files in there 
                 that you want to keep.  
@@ -68,16 +67,16 @@ Options:
         alias: --directory
         example: java -jar can-0v1.jar  -a [address] -dir /var/www/html/data
 
--f      Sets the maximum number of data files to create. After
++ `-f`      Sets the maximum number of data files to create. After
         this number is reached, can-0v1 will exit quietly.
         default: off
         alias: --file-limit
         example: java -jar can-0v1.jar -a [address] -f 5
 
--help   Brings up this help screen
++ `-help`   Brings up this help screen
         example: java -jar can-0v1 -help
 
--i      Enables infinite data file. The logger will
++ `-i`      Enables infinite data file. The logger will
         write to a single data file until it is stopped.
         The logger can be stopped through the -t option or
         the cgi-bin interface
@@ -85,25 +84,25 @@ Options:
         alias: --infinite
         example: java -jar can-0v1.jar -a [address] -i
 
--l      Sets the maximum number of samples per data file
++ `-l`      Sets the maximum number of samples per data file
         Cannot be set when -i is used.
         default: 1000
         alias: --length
         example: java -jar can-0v1.jar  -a [address] -l 2500
 
--t      Sets a period of time in milliseconds for the logger to run
++ `-t`      Sets a period of time in milliseconds for the logger to run
         After the specified time can-0v1 will exit quietly.
         default: off
         alias: -timed, --runtime
         example: java -jar can-0v1.jar  -a [address] -t 5000
 
--s      If set then the logger will start recording data immediately.
++ `-s`      If set then the logger will start recording data immediately.
         If this flag is not set the logger will wait for a 
         command from the cgi-bin interface to begin recording
         default: off
         alias: --start, --start-immediately
 
-help    Brings up the args4j generated helpscreen
++ `help`    Brings up the args4j generated helpscreen
         example: java -jar can-0v1 help
 
 

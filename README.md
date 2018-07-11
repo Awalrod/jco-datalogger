@@ -41,37 +41,35 @@ Options:
 + `-a`      Sets the IF socat address.  
         default: None(REQUIRED)  
         alias: --address  
-        example: java -jar can-0v1.jar -a '10.10.3.1'  
+        example: java -jar jco-dl-1v1.jar -a '10.10.3.1'  
 
 + `-b`      Sets the base name for the data files. The resulting
         filename will be [base-name][nnn].csv. [nnn] is the nth
-        data file created in this specific session. Note that
+        data file created in this specific session. IMPORTANT:
         can-0v1 will overwrite files with the same name.  
         default: DATA_  
         alias: --base-name  
-        example: java -jar can-0v1.jar  -a [address] -b Experiment_  
+        example: java -jar jco-dl-1v1.jar  -a [address] -b Experiment_  
 
 + `-d`     Enables debugging statements. These include various  
         status updates and output to the data files  
         default: off  
         alias: --debug  
-        example: java -jar can-0v1.jar  -a [address] -d  
+        example: java -jar jco-dl-1v1.jar  -a [address] -d  
 
 + `-dir`    Sets the directory in which the data files will be placed.   
-        IMPORTANT: This is also the directory that the cgi-bin
-                interface will clear when commanded to. If you set a
-                directory besides /var/www/html/data be sure you are careful
-                when clearing it. Make sure there are no .csv files in there
+        IMPORTANT: This is also the directory that will be cleared. All csv
+	files will be deleted. Make sure there are no .csv files in there
                 that you want to keep.  
         default: ./  
         alias: --directory  
-        example: java -jar can-0v1.jar  -a [address] -dir /var/www/html/data  
+        example: java -jar jco-dl-1v1.jar  -a [address] -dir /var/www/html/data  
 
 + `-f`      Sets the maximum number of data files to create. After
         this number is reached, can-0v1 will exit quietly.  
         default: off  
         alias: --file-limit  
-        example: java -jar can-0v1.jar -a [address] -f 5  
+        example: java -jar jco-dl-1v1.jar -a [address] -f 5  
 
 + `-help`   Brings up this help screen  
         example: java -jar can-0v1 -help  
@@ -79,28 +77,31 @@ Options:
 + `-i`      Enables infinite data file. The logger will
         write to a single data file until it is stopped.
         The logger can be stopped through the -t option or
-        the cgi-bin interface.    
+        the WebSocketServer interface.    
         default: off  
         alias: --infinite  
-        example: java -jar can-0v1.jar -a [address] -i  
+        example: java -jar jco-dl-1v1.jar -a [address] -i  
 
 + `-l`      Sets the maximum number of samples per data file
         Cannot be set when -i is used.  
         default: 1000  
         alias: --length  
-        example: java -jar can-0v1.jar  -a [address] -l 2500  
+        example: java -jar jco-dl-1v1.jar  -a [address] -l 2500  
 
 + `-t`      Sets a period of time in milliseconds for the logger to run
         After the specified time can-0v1 will exit quietly.  
         default: off  
         alias: -timed, --runtime  
-        example: java -jar can-0v1.jar  -a [address] -t 5000  
+        example: java -jar jco-dl-1v1.jar  -a [address] -t 5000  
 
 + `-s`      If set then the logger will start recording data immediately.
         If this flag is not set the logger will wait for a 
-        command from the cgi-bin interface to begin recording  
+        command from the WebSocketServer interface to begin recording  
         default: off  
-        alias: --start, --start-immediately  
+        alias: --start, --start-immediately
++ `--xml-config`	Sets the config file that will be read at startup.  
+	example: java -jar jco-d1-1v1.jar -a [address] --xml-config
+	"loggerconfig.xml"  
 
 + `help`    Brings up the args4j generated helpscreen  
         example: java -jar can-0v1 help  

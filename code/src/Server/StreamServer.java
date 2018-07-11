@@ -64,20 +64,20 @@ public class StreamServer extends WebSocketServer {
 	@Override //from WebSocketServer
 	public void onMessage( WebSocket conn, String message ) {
 		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + message );
-		if(message.contains("nodeid?=")){
+		if(message.contains("nodeid=")){
 			if(message.contains("all")){
 				getStreamByConn(conn).setStreamAll(true);
 			}else{
-				Integer nodeId = Integer.decode(message.substring(8));
+				Integer nodeId = Integer.decode(message.substring(7));
 				getStreamByConn(conn).setNodeId(nodeId);
 				getStreamByConn(conn).setStreamAll(false);
 			}
 		}else{
 			switch(message){
-				case "stream?=true":
+				case "stream=true":
 					getStreamByConn(conn).setStreaming(true);
 					break;
-				case "stream?=false":
+				case "stream=false":
 					getStreamByConn(conn).setStreaming(false);
 					break;
 				default:

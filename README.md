@@ -73,9 +73,9 @@ dictionary. Example of changing the sample rate:
 Where `$val` is the desired time interval between samples in microseconds.  
 
 The WebSocket server sits at port 7333 and accepts commands to control the data stream.
-+ `stream?=true/false`: Turns streaming on or off
-+ `nodeid?=$nodeid`: Changes nodeData that gets streamed. `$nodeId` is the index of the node in the list of nodes provided in `loggerconfig.xml`, NOT the actual node ID.  
-  `nodeid?=all` will send all the node data.  
++ `stream=true/false`: Turns streaming on or off
++ `nodeid=$nodeid`: Changes nodeData that gets streamed. `$nodeId` is the index of the node in the list of nodes provided in `loggerconfig.xml`, NOT the actual node ID.  
++ `nodeid=all` will send all the node data.  
 
 
 ## Other Repositories:

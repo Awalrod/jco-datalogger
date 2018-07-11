@@ -84,26 +84,25 @@
 		
 
         <script src="http://d3js.org/d3.v3.min.js"></script>
-        <script src="fft.js"></script>
         <script>
 		function streamToggle(){
 			if(isStreaming){
 				isStreaming = false;
-				socket.send("stream?=false");
+				socket.send("stream=false");
 			}else{
 				isStreaming = true;
-				socket.send("stream?=true");
+				socket.send("stream=true");
 			}
 		}	
-		</script>
-		<script>
+	</script>
+        <script>
 		function changeNode(nodeNum){
 			nodeId=nodeNum-1
-			socket.send("nodeid?="+nodeId)
+			socket.send("nodeid="+nodeId)
 		}
-		</script>	
+	</script>	
+        
         <script>
-        	
 		var 	limit = 600,
 			duration = 100, 
 			now = new Date(Date.now())
@@ -114,7 +113,7 @@
 			Page becomes unresponsive if the limit is too high
 			Both need to be made dynamic
 		   */ 
-		
+			
 			
 		var 	width = 700,
 			height = 400
@@ -123,36 +122,36 @@
 			x: {
 				value: 0,
 				color: 'orange',
-				data: d3.range(limit).map(function(d,i) {
-					return [i,i] //[f,?]
+				data: d3.range(limit).map(function() {
+					return [now,0] //[time,val]
 				})
 			},
 			y: {
 				value: 0,
 				color: 'green',
 				data: d3.range(limit).map(function() {
-					return [0,0]
+					return [now,0]
 				})
 			},
 			z: {
 				value: 0,
 				color: 'grey',
 				data: d3.range(limit).map(function() {
-					return [0,0]
+					return [now,0]
 				})
 			}
 		}
 
-		var x = d3.scale.linear()
-			.domain([0,100])
+		var x = d3.time.scale()
+			.domain([then, now - duration])
 			.range([0, width])
 
 		var y = d3.scale.linear()
-			.domain([0, 1000000])
+			.domain([-300000, 300000])
 			.range([height, 0])
 
 		var line = d3.svg.line()
-			//.interpolate('basis')
+			.interpolate('basis')
 			.x(function(d, i) {
 				return x(d[0])
 			})
@@ -192,107 +191,20 @@
 		},1000);*/
 		lastDate = new Date()
 		nodeId = 0
-		var xList=[], yList=[], zList = [];
-		var desiredSize = 128; //powers of 2 work better???
-		
-		var difs = new Array(desiredSize/4)//rolling average
-		
 		socket.onmessage = function(event){
 			now = new Date()
 			var dif = now-lastDate
 			//console.log(dif)
 			lastDate = now
-			//console.log(event.data);
 			var sensorData = JSON.parse(event.data)
-			//console.log(sensorData)
-			xList.push(sensorData.x)
-			yList.push(sensorData.y)
-			zList.push(sensorData.z)
-			difs.push(dif)
-			difs.shift()
-			//console.log(difs)
-			if(xList.length==desiredSize){
-				var imag = new Array(desiredSize).fill(0).map(function(){
-					return 0;
-				})
-				var sr=0;
-				for(var d in difs){
-					sr = sr+ difs[d]
-				}
-				sr = sr/difs.length
-				sr = 1000/sr
-				f_axis = new Array(desiredSize/2).fill(0).map(function(d,i) {return i*(sr/2)/(desiredSize/2)})
-				//console.log(xList)
-				//console.log(imag)
-				var x_fft = xList.slice()
-				//console.log(x_fft)
-				transform(x_fft,imag.slice())
-				//console.log(x_fft)
-				//console.log(imag)
-				var x_mod = x_fft.map(function(d){
-					return Math.abs(d)
-				})
-				var x_mod_half = x_mod.slice(0,x_mod.length/2)
-				//console.log(x_mod_half)
-
-				x_zipped = f_axis.map(function(d,i){
-					return [d,x_mod_half[i]]
-				})
-				
-				
-				var y_fft = yList.slice()
-				transform(y_fft,imag.slice())
-				var y_mod = y_fft.map(function(d){
-					return Math.abs(d)
-				})
-				var y_mod_half = y_mod.slice(0,y_mod.length/2)
-
-				y_zipped = f_axis.map(function(d,i){
-					return [d,y_mod_half[i]]
-				})
-				
-				
-				var z_fft = zList.slice()
-				transform(z_fft,imag.slice())
-				var z_mod = z_fft.map(function(d){
-					return Math.abs(d)
-				})
-				var z_mod_half = z_mod.slice(0,z_mod.length/2)
-
-				z_zipped = f_axis.map(function(d,i){
-					return [d,z_mod_half[i]]
-				})
-				
-				
-				
-				
-				
-
-				Node.x.path.data([x_zipped])
-				Node.x.path.attr('d',line)
-				Node.y.path.data([y_zipped])
-				Node.y.path.attr('d',line)
-				Node.z.path.data([z_zipped])
-				Node.z.path.attr('d',line)
-				
-				x.domain([0,f_axis[f_axis.length-1]])	
-				xaxis.transition()
-					.duration(100)
-					.ease("linear")
-					.call(x.axis)
-				xList = []
-				zList = []
-				yList = []
-			}
-			
 			//console.log(sensorData.x)
-			/*for (var name in Node) {
+			for (var name in Node) {
 				var group = Node[name]
 ~				group.data.push([now,sensorData[name]])
 				group.path.attr('d', line) // 'd' for draw
 			
 			}
-			
+
 			// Shift domain
 			//x.domain([now - (limit - 2) * duration, now - duration])
 			x.domain([Node.x.data[0][0],now-dif]);
@@ -308,7 +220,6 @@
 				var group = Node[name]
 				group.data.shift()
 			}
-			*/
 			
 		};       
         </script>

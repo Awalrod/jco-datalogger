@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="lib/Bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/bootstrap-slider.min.css">
+    <title>GCDC Data Logger</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <div class="navbar-brand col-sm-3 col-md-3 mr-0">GCDC Data Logger</div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row" id="sidebar">
+        <nav class="col-md-3 col-sm-3 d-none d-md-block bg-light">
+          <div class="sidebar-sticky mt-5">
+            
+            <ul class="nav flex-column">
+              
+              <li class="nav-item m-1">
+                <div class="btn-group-vertical">
+                  <button class="btn btn-success nav-button" type="button" id="startLogging">Start Logging</btn>
+                  <script>
+                    function startLogging(){
+                      if(!isLogging){
+                        isLogging = true;
+                        controllerSocket.send("recording=start")
+                      }
+                      var isCollapsed = document.getElementById("fileAlert").classList.contains("collapse")
+                      if(isCollapsed == isLogging){
+                        document.getElementById("fileAlert").classList.toggle("collapse")
+                      }
+                      document.getElementById("startLogging").disabled = isLogging
+                      document.getElementById("stopLogging").disabled = !isLogging
+                    }
+                  </script>
+                  <button class="btn btn-danger nav-button" type="button" id="stopLogging">Stop Logging</btn>              
+                  <script>
+                    function stopLogging(){
+                      if(isLogging){
+                        isLogging = false;
+                        controllerSocket.send("recording=stop")
+                        updateFiles()
+                      }
+                      var isCollapsed = document.getElementById("fileAlert").classList.contains("collapse")
+                      if(isCollapsed == isLogging){
+                        document.getElementById("fileAlert").classList.toggle("collapse")
+                      }
+                      document.getElementById("startLogging").disabled = isLogging
+                      document.getElementById("stopLogging").disabled = !isLogging
+                    }
+                  </script>
+                </div>
+                <div class="collapse mt-1" id="fileAlert"> 
+                  <div class="alert alert-success show" role="alert">
+                    Files are being recorded
+                  </div>
+                </div>
+              </li>
+              <li class="nav-item m-1">
+                
+                <div class="input-group mb-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Sample size:</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="samples perfile" id="sampleSize">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" onclick="sampleSize()" id="sampleSizeBtn">Set</button>
+                    <script>
+                      document.getElementById("sampleSize").addEventListener("keyup",function(event){
+                        event.preventDefault()
+                        if(event.keyCode === 13){//Enter button Pressed
+                          document.getElementById("sampleSizeBtn").click()
+                          document.getElementById("sampleSize").blur()
+                        }
+                      })
+                      function sampleSize(){
+                        var val =document.getElementById("sampleSize").value
+                        controllerSocket.send("numSamples="+val) 
+                      }
+                    </script>
+                  </div>
+                </div>
+                
+                <div class="input-group mb-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Filename:</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="File name" id="fileName">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" onclick="fileName()" id="fileNameBtn">Set</button>
+                    <script>
+                      document.getElementById("fileName").addEventListener("keyup",function(event){
+                        event.preventDefault()
+                        if(event.keyCode === 13){
+                          document.getElementById("fileNameBtn").click()
+                          document.getElementById("fileName").blur()
+                        }
+                      })
+                      function fileName(){
+                        var val = document.getElementById("fileName").value
+                        controllerSocket.send("fileName="+val)
+                      }
+                    </script>
+                  </div>
+                </div>
+                
+                <div class="input-group mb-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Sample rate:</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="sample rate" id="sampleRate">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" onclick="sampleRate()" id="sampleRateBtn">Set</button>
+                    <script>
+                      document.getElementById("sampleRate").addEventListener("keyup",function(event){
+                        event.preventDefault()
+                        if(event.keyCode === 13){
+                          document.getElementById("sampleRateBtn").click()
+                          document.getElementById("sampleRate").blur()
+                        }
+                      })
+                      function sampleRate(){
+                        var val = document.getElementById("sampleRate").value
+                        controllerSocket.send("sampleRate="+val)
+                      }
+                    </script>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-9 px-4">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="nav mt-3">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a id="streamTab"class="nav-link active" data-toggle="tab" href="#stream">Stream</a></li>
+                  <li><a id="fftTab" class="nav-link" data-toggle="tab" href="#fft">FFT</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-sm-8">
+              <div class="btn-toolbar mb-2 mt-3">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-secondary" id="startStream" onclick="startStream()">Start Stream</button>
+                  <script>
+                    function startStream(){
+                      if(!isStreaming){
+                        isStreaming = true;
+                        streamSocket.send("stream=true")
+                        graphTimer = setInterval(streamGraph.updateGraph,1000/throttleRate)
+                        var tempNow = new Date();
+                        for(var name in streamGraph.Node){
+                                group = streamGraph.Node[name]
+                                group.data=group.data.map(function(){
+                                        return [tempNow,0]
+                                })
+                                group.path.data([group.data])
+                        }
+
+                      }
+                      document.getElementById("stopStream").disabled = !isStreaming;
+                      document.getElementById("startStream").disabled= isStreaming;
+                    }
+                  </script>
+                  <button class="btn btn-sm btn-outline-secondary" id="stopStream" onclick="stopStream()">Stop Stream</button>
+                  <script>
+                    function stopStream(){
+                      if(isStreaming){
+                        isStreaming = false;
+                        streamSocket.send("stream=false")
+                        clearInterval(graphTimer)
+                      }
+                      document.getElementById("stopStream").disabled = !isStreaming;
+                      document.getElementById("startStream").disabled=isStreaming;                    
+                    }
+                  </script>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    data-toggle="dropdown">
+                    Node
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#" onclick="changeNode(0);return false;">1</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(1);return false;">2</a>                
+                    <a class="dropdown-item" href="#" onclick="changeNode(2);return false;">3</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(3);return false;">4</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(4);return false;">5</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(5);return false;">6</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(6);return false;">7</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(7);return false;">8</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(8);return false;">9</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(9);return false;">10</a>
+                    <a class="dropdown-item" href="#" onclick="changeNode(10);return false;">11</a>
+                  </div>
+                  <script>
+                    function changeNode(nodeNum){
+                      streamSocket.send("nodeid="+nodeNum)
+                    }
+                  </script>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Graph Refresh Rate
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#" onclick="setGraphRefresh(5);return false;">5hz (slow)</a>
+                    <a class="dropdown-item" href="#" onclick="setGraphRefresh(10);return false;">10hz (good)</a>              
+                    <a class="dropdown-item" href="#" onclick="setGraphRefresh(20);return false;">20hz (fast)</a>
+                    <a class="dropdown-item" href="#" onclick="setGraphRefresh(40);return false;">40hz (very fast)</a>
+                  </div>
+                  <script>
+                    function setGraphRefresh(rate){
+                      throttleRate = rate
+                      if(isStreaming){
+                        clearInterval(graphTimer)
+                        graphTimer = setInterval(streamGraph.updateGraph, 1000/throttleRate)
+                      }
+                    }
+                  </script>                
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="tab-content">
+              <div id="stream" class="tab-pane fade in show active">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <h2 class="h4 m-2 border-bottom">Stream Display</h2>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="btn-toolbar ml-2">
+                      <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-secondary" id="zoomIn"><img src="images/zoom-in.svg" width="15px" height="15px"></button>
+                        <button class="btn btn-sm btn-outline-secondary" id="zoomOut"><img src="images/zoom-out.svg" width="15px" height="15px"></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-sm-1 p-0 mr-0 text-right">
+                    <input id="rangeSlider" data-slider-id="slider1" type="text" class="slider" data-slider-min="-300000" data-slider-max="300000" data-slider-step="10" 
+                    data-slider-value="[-300000,300000]" data-slider-orientation="vertical" data-slider-handle="triangle" data-slider-tooltip="always"/>
+                    
+                  </div>
+                  <div class="graph stream col-sm-11 p-0" id="streamGraph"></div>
+                </div>
+              </div>
+              
+              <div class="tab-pane fade in" id="fft">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                  <h2 class="h4">FFT Display</h2>
+                </div>
+                <div class="graph fft" id="fftGraph"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <h2>Data Files</h2>
+            <div class="btn-toolbar">
+              <button class="btn btn-danger m-1 p-1" data-toggle="confirmation" data-popout="true" id="clearDataFiles"><img src="images/trash.svg" width="12px" height="12px">Clear</button>
+              <script>
+                function clearDataFiles(){
+                  controllerSocket.send("clearData")
+                  controllerSocket.send("fileRequest")
+                }
+              </script>
+              <button class="btn btn-outline-secondary m-1 p-1" id="generateZipButton"><img src="images/file.svg" width="12px" height="12px">Generate .zip</button>
+              <script>
+                function generateZip(){
+                  controllerSocket.send("zipRequest")
+                  document.getElementById("generateZipButton").disabled = true;
+                  document.getElementById("generateZipCollapse").classList.toggle("collapse")
+                }
+              </script>
+              <div class="collapse" id="generateZipCollapse">
+                <div class="pt-2" id="waiting">
+                  <div style="float:left;">Working...</div>
+                </div>            
+              </div>
+              <div class="collapse" id="downloadZipCollapse">
+                <a class="btn btn-outline-primary" id="downloadZip"><img src="images/data-transfer-download.svg" width="12px" height="12px">Download</a>
+                <script>
+                  document.getElementById("downloadZip").addEventListener("click", function(){
+                    document.getElementById("downloadZipCollapse").classList.toggle("collapse")
+                    document.getElementById("generateZipButton").disabled=false;
+                  })
+                </script>
+              </div>    
+            </div>
+          </div>
+          <div class="row">
+            <div class="table-responsive">
+          
+              <table class="table table-striped table-sm" id="dataFiles">
+                <thead>
+                  <tr>
+                    <th><a href="#"  id="byFileName">File Name<img src="/images/caret-bottom.svg" id="fileCaret" opacity="1"></a></th>
+                    <th><a href="#"  id="byTime">Time<img src="/images/caret-bottom.svg" id="timeCaret" opacity="0"></a></th>
+                    <th><a href="#"  id="bySamples">Size(samples)<img src="/images/caret-bottom.svg" id="sampleCaret" opacity="0"></a></th>
+                    <th><a href="#"  id="byBytes">Size(bytes)<img src="/images/caret-bottom.svg" id="byteCaret" opacity="0"></a></th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+
+    
+    <script src="lib/d3/d3.v3.min.js"></script>
+    <script src="lib/streamGraph.js"></script>
+    <script src="lib/fft.js"></script> <!-- math -->
+    <script src="lib/fftGraph.js"></script>
+    
+    <script>
+      var throttleRate = 10;
+      var isLogging = false;
+      var isStreaming = false;
+      var streamSocket = new WebSocket("ws://192.168.1.57:7333")
+      var controllerSocket = new WebSocket("ws://192.168.1.57:7331")
+    
+      var graphTimer;
+      var streamGraph = new StreamGraph(700,400,'#streamGraph')
+      var fftGraph = new FFTGraph(700,400,'#fftGraph')
+      
+      streamGraph.updateGraph();
+
+      streamSocket.onmessage = function(event){
+        if(document.getElementById("streamTab").classList.contains("active")){
+          streamGraph.updateData(event)
+        }else{
+          fftGraph.updateData(event)  
+        }
+      }
+      
+      
+      
+      
+      function updateFiles(){
+        controllerSocket.send("fileRequest")
+      }
+      var clicks = {//used for ascending/descending sorting
+        name: 0,
+        time: 0,
+        sSize: 0,
+        bSize: 0
+      }
+      var sortable = {
+        "name":0,
+        "time":1,
+        "samples":2,
+        "bytes":3
+      }
+      var currentSort=sortable.name; //used to sort data when a file update is received
+      
+      var table = d3.select('table')
+      var tbody = table.append('tbody')
+      var rows 
+      var currentFiles = []
+     
+      controllerSocket.onmessage = function(event){
+        var data = JSON.parse(event.data)
+        for(name in data){
+          //List of files with extra info
+          if(name == "fileList"){
+            var fileList = data[name]
+            tbody.selectAll('tr').remove()
+            rows = tbody.selectAll('tr')
+              .data(fileList)
+              .enter()
+              .append('tr')
+            var cells = rows.selectAll('td')
+              .data(function(row){
+                return row
+              })
+              .enter()
+              .append('td')
+              .text(function(d,i){
+                if(i==0){return ""}
+                else{return d}
+              });
+            cells.filter(function(d,i){return i == 0})
+              .append("a")
+              .attr("href",function(d){
+                return "data/"+d
+              })
+              .attr("download","")
+              .html(function(d){
+                return d;
+              })
+              
+            if(currentSort==sortable.name){
+              sortByName()
+            }
+            else if(currentSort==sortable.time){
+              sortByTime()
+            }
+            else if(currentSort==sortable.samples){
+              sortBySamples()
+            }
+            else if(currentSort==sortable.bytes){
+              sortByBytes()
+            }
+          }
+          //Either recording or not 
+          else if(name=="recordingStatus"){
+            var fileAlert = document.getElementById("fileAlert")
+            isLogging = data[name] //true or false
+            var isCollapsed = fileAlert.classList.contains("collapse")
+            if(isCollapsed == isLogging){
+              fileAlert.classList.toggle("collapse")
+            }
+            document.getElementById("startLogging").disabled = isLogging
+            document.getElementById("stopLogging").disabled = !isLogging
+          }
+          //zip archive created
+          else if(name=="zipCreated"){
+            document.getElementById("generateZipCollapse").classList.toggle("collapse")
+            document.getElementById("downloadZip").setAttribute("href","data/archive/"+data[name])
+            
+            document.getElementById("downloadZip").setAttribute("download","")
+            document.getElementById("downloadZipCollapse").classList.toggle("collapse")
+          }
+        }      
+      }
+      
+      
+      function sortByName(){
+        rows.sort(function(a,b){
+          if(a[0] < b[0]){
+            return clicks.name%2==0 ? -1:1
+          }else if(a[0] > b[0]){
+            return clicks.name%2==0 ? 1:-1
+          }else{
+            return 0
+          }
+        })                   
+      }
+      function sortByTime(){
+        rows.sort(function(a,b){
+          if(Date.parse(a[1])<Date.parse(b[1])){
+            return clicks.time%2==0 ? -1:1
+          }else if(Date.parse(a[1])>Date.parse(b[1])){
+            return clicks.time%2==0 ? 1:-1
+          }else{
+            return 0;
+          }
+        })
+      }
+      function sortBySamples(){
+        rows.sort(function(a,b){
+          if(parseInt(a[2]) < parseInt(b[2])){
+            return clicks.sSize%2==0 ? -1:1
+          }else if(parseInt(a[2]) > parseInt(b[2])){
+            return clicks.sSize%2==0 ? 1:-1
+          }else{
+            return 0
+          }
+        })
+      }
+      function sortByBytes(){
+        rows.sort(function(a,b){
+          if(parseInt(a[3]) < parseInt(b[3])){
+            return clicks.bSize%2==0 ? -1:1
+          }else if(parseInt(a[3]) > parseInt(b[3])){
+            return clicks.bSize%2==0 ? 1:-1
+          }else{
+            return 0
+          }
+        })
+      }
+      
+      function sortByNameClicked(){
+        clicks.name++
+        currentSort=sortable.name
+        sortByName()
+        updateCaret()
+        return false
+      }
+      function sortByTimeClicked(){
+        clicks.time++
+        currentSort=sortable.time
+        sortByTime()
+        updateCaret()
+        return false
+      }
+      function sortBySamplesClicked(){
+        clicks.sSize++
+        currentSort=sortable.samples
+        sortBySamples()
+        updateCaret()
+        return false
+      }
+      function sortByBytesClicked(){
+        clicks.bSize++
+        currentSort=sortable.bytes
+        sortByBytes()
+        updateCaret()
+        return false
+      }
+      
+      function updateCaret(){
+        d3.select("table").selectAll("img")
+          .style("opacity","0")
+        var id = ''
+        var isUp = true
+        if(currentSort==sortable.name){
+          id = "#fileCaret"
+          isUp = clicks.name%2==1
+        }
+        else if(currentSort==sortable.time){
+         id = "#timeCaret" 
+         isUp = clicks.time%2==1
+        }
+        else if(currentSort==sortable.samples){
+          id = "#sampleCaret"
+          isUp = clicks.sSize%2==1
+        }
+        else if(currentSort==sortable.bytes){
+          id = "#byteCaret"
+          isUp = clicks.bSize%2==1
+        }
+        d3.select(id).style("opacity","1")
+          .attr("src",function(){
+            if(isUp){
+              return "/images/caret-top.svg"
+            }else{
+              return "/images/caret-bottom.svg"
+            }
+          })
+      }
+      //assigning functions to javascript the right way
+      //?
+      window.onload = function(){
+        document.getElementById("byFileName").onclick= sortByNameClicked;  
+        document.getElementById("byTime").onclick=sortByTimeClicked;
+        document.getElementById("bySamples").onclick=sortBySamplesClicked;
+        document.getElementById("byBytes").onclick=sortByBytesClicked;
+      }
+      controllerSocket.onopen = function(){
+        controllerSocket.send("fileRequest")
+      }
+             
+    </script>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="lib/jquery-3.3.1.slim.min.js"></script>
+    <script src="lib/popper.min.js"></script>
+    <script src="lib/Bootstrap/js/bootstrap.min.js"></script>    
+    <script src="lib/bootstrap-confirmation.min.js"></script>
+    <script src="lib/bootstrap-slider.min.js"></script>
+    <!--Needs jquery-->
+    <script>
+      $('[data-toggle=confirmation]').confirmation({
+        rootSelector: '[data-toggle=confirmation]',
+        // other options
+      });
+      $('#clearDataFiles').click(clearDataFiles)
+      //Assign onlick late for special reasons?
+      //"plugin must be initialized before attaching event listener"
+      
+      //"Delegated event handlers"
+      //can't have onclick and data-toggle?
+      $(document).on("click","#startLogging",startLogging)
+      $(document).on("click","#stopLogging",stopLogging)
+      $(document).on("click","#generateZipButton",generateZip)
+      
+      //data slider stuff:
+      $('#rangeSlider').slider({
+        reversed: true,
+        precision: 0,
+        tooltip: 'always',
+        tooltip_position: 'left',
+        formatter: function(value){
+          return "Difference: "+(value[1]-value[0])
+        }
+      });
+      $('#rangeSlider').slider().on('change', function(event){
+        var a = event.value.newValue;
+        var b = event.value.oldValue;
+
+        var changed = !($.inArray(a[0], b) !== -1 && 
+                        $.inArray(a[1], b) !== -1 && 
+                        $.inArray(b[0], a) !== -1 && 
+                        $.inArray(b[1], a) !== -1 && 
+                        a.length === b.length);
+
+        if(changed){
+          streamGraph.setGuides(a[0],a[1])
+        }
+      })
+      $(document).on("click","#zoomIn", function(){
+        bounds = $("#rangeSlider").slider('getValue')
+        streamGraph.updateBounds(bounds[0],bounds[1])
+        $("#rangeSlider").slider('setAttribute', 'max', bounds[1])
+        $("#rangeSlider").slider('setAttribute', 'min', bounds[0])
+        $("#rangeSlider").slider('setAttribute', 'step', Math.round((bounds[1]-bounds[0])/60000)+1)//+1 so value is always greater than 0
+        $("#rangeSlider").slider('setAttribute', 'value', bounds)
+        $("#rangeSlider").slider('refresh')
+      })
+      $(document).on("click","#zoomOut",function(){
+        oldBounds = $("#rangeSlider").slider('getValue')
+        dif = streamGraph.max-streamGraph.min
+        avg = (oldBounds[0]+oldBounds[1])/2
+        bounds = [avg-dif,avg+dif] //Doubles the virtual area shown
+        streamGraph.updateBounds(bounds[0],bounds[1])
+        $("#rangeSlider").slider('setAttribute', 'max', bounds[1])
+        $("#rangeSlider").slider('setAttribute', 'min', bounds[0])
+        $("#rangeSlider").slider('setAttribute', 'step', Math.round((bounds[1]-bounds[0])/60000)+1)//+1 so value is always greater than 0
+        $("#rangeSlider").slider('setAttribute', 'value',oldBounds)
+        $("#rangeSlider").slider('refresh')
+         
+      })
+    </script>
+  </body>
+</html>

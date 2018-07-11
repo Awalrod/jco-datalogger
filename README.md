@@ -22,8 +22,10 @@ of the server are set in
 [loggerconfig.xml](jco-datalogger/code/loggerconfig.xml).
 Any other application can open a WebSocket at the correct address and
 recieve a stream of JSON data from the logger.
-[streamExample.html](jco-datalogger/code/streamExample.html) is an example
-written in javascript using the [d3.js](https://d3js.org/) library for graphing.  
+[streamExample.html](jco-datalogger/code/examples/streamExample.html) is an example
+written in javascript using the [d3.js](https://d3js.org/) library for
+graphing. [index.html](jco-datalogger/code/examples/index.html) is a more
+robust dashboard-style monitor for the logger.
 
 The JSON object sent is in the form:  
 `[{"x":0,"y":0,"z":0},{"x":-29362,"y":64095,"z":245445},{"x":-155975,"y":-84501,"z":185922},{"x":78515,"y":124510,"z":206242},{"x":0,"y":0,"z":0},{"x":0,"y":0,"z":0},{"x":0,"y":0,"z":0}]`  
@@ -34,7 +36,7 @@ aren't physically connected will show up as `{"x":0,"y":0,"z":0}` in the
 data stream.
 
 
-## API  
+## Runtime Options 
 Currently the controller for the data recording portion of the application
 sits on a websocket server at port 7331. Here are valid commands:  
 + `recording=start`: Starts recording .csv files.  

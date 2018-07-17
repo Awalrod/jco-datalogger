@@ -9,7 +9,7 @@ function FFTGraph(width, height, id){
         .domain([0,100])
         .range([0,width])
     this.y = d3.scale.linear()
-        .domain([0,250])
+        .domain([0,160])
         .range([height,0])
     this.line = d3.svg.line()
         .x((d) =>{
@@ -22,6 +22,12 @@ function FFTGraph(width, height, id){
         .attr('class','chart')
         .attr('width', width +50)
         .attr('height', height +100)
+        .on('mousemove',()=>{
+            var bisector = d3.bisector(function(d){ return d.x; }).left;
+            var xCoord = d3.mouse(this.svg[0][0])[0]
+            var virt = this.x.invert(xCoord)
+            //Use this to implement crosshair
+        })
     this.xaxis = this.svg.append('g')
         .attr('class','x axis')
         .attr('transform','translate(0,'+height+')')
@@ -29,12 +35,12 @@ function FFTGraph(width, height, id){
     this.yaxis = this.svg.append('g')
         .attr('class','y axis')
         .call(this.y.axis = d3.svg.axis().scale(this.y).orient('right'))
-    
     this.paths = this.svg.append('g')
     this.path = this.paths.append('path')
         .data([this.data])
         //.style('stroke','red')
-        //.style('fill','none')
+        //.style('fill','none') //Do it in css
+    this.label = this.svg.append("text")
     this.lastDate = new Date(Date.now())//used for difs
     this.updateData = (event) =>{
         now = new Date(Date.now())
@@ -66,6 +72,7 @@ function FFTGraph(width, height, id){
                 return(Math.sqrt(d**2+mag_imag[i]**2))
             })
             var mag_mod_half = mag_mod.slice(0,mag_mod.length/2)
+            
             mag_zipped = f_axis.map(function(d,i){
                 return [d,mag_mod_half[i]]
             })
@@ -76,8 +83,36 @@ function FFTGraph(width, height, id){
                 .duration(0)
                 .ease("linear")
                 .call(this.x.axis)
+                
+            max = this.getMax(mag_mod_half.slice(1))
+            this.drawMax([f_axis[max[1]+1],20*Math.log10(max[0])])//add 1 because we sliced the first index    
+                
             this.mag_list = []        
         }
         
+    }
+    this.getMax = (numList) =>{
+        var max = numList[0]
+        i=0
+        index=0
+        while(i < numList.length){
+            num = numList[i]
+            if(max<num){
+                max = num
+                index = i
+            }
+            i++
+        }
+        return [max,index]
+    }
+    this.drawMax = (point) =>{
+        this.label.remove()
+        this.label = this.svg.append('text')
+            .attr('transform','translate('+(this.x(point[0])+5)+','+(this.y(point[1])-5)+')')
+            .text(Math.round(point[0])+'Hz')
+            .attr("font-size", '9px')
+            .attr('font-family','monospace')
+            .style('stroke','black')
+            .style('stroke-width','.5')
     }
 }

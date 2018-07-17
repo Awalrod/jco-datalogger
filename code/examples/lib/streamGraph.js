@@ -6,27 +6,35 @@ function StreamGraph(width,height,id){
     this.width=width
     this.height=height
     this.limit = 2000
+   
     this.Node={
         x:{
-            value: 0,
-            color: 'orange',
+            vis: true,
+            z0: 0,//for iir filter
             data: d3.range(this.limit).map(function() {
                 return [Date.now(),0] //[time,val]
             })
         },
         y:{
-            value: 0,
-            color: 'green',
+            vis: true,
+            z0: 0,
             data: d3.range(this.limit).map(function() {
                 return [Date.now(),0]
             })
         },
         z:{
-            value: 0,
-            color: 'grey',
+            vis:true,
+            z0: 0,
             data: d3.range(this.limit).map(function() {
                 return [Date.now(),0]
             })
+        },
+        mag:{
+            vis:false,
+            z0:0,
+            data: d3.range(this.limit).map(function() {
+                return [Date.now(),0]
+            }) 
         }
     }
     this.x = d3.time.scale()
@@ -38,7 +46,7 @@ function StreamGraph(width,height,id){
         .range([height, 0])
 
     this.line = d3.svg.line()
-        .interpolate('cardinal')
+        .interpolate('linear')
         .x((d, i)=> {
             return this.x(d[0])
         })
@@ -155,9 +163,18 @@ function StreamGraph(width,height,id){
 
 
     
-    this.updateData = (event) => { //arrow function doesn't reassign `this` to websocket instance
+    this.updateData = (event) => { 
         now = new Date(Date.now())
         var sensorData = JSON.parse(event.data)
+        sumOfSquares = 0
+        for(name in sensorData){
+            d = sensorData[name]
+            sumOfSquares += d**2
+        }
+        mag = Math.round(Math.sqrt(sumOfSquares))
+        sensorData["mag"]=mag
+        
+        sensorData = this.filter(sensorData)
         for( var name in this.Node){
             group = this.Node[name]
             group.data.push([now,sensorData[name]])
@@ -168,9 +185,39 @@ function StreamGraph(width,height,id){
         this.x.domain([now-(10*1000),now])
     }
     
+    this.IIR = false;
+    this.alpha = .9
+    this.filter = (sensorData) =>{
+        if(this.IIR){
+            newSensorData={}//empty object
+            for(var name in this.Node){
+                group = this.Node[name]
+                dataIn = sensorData[name]
+                z0 = group.z0
+                z1 = this.alpha*z0+(1-this.alpha)*dataIn
+                newSensorData[name] = dataIn-z1
+                group.z0=z1
+            }
+            return newSensorData
+        }//add more as needed
+        else{
+            return sensorData
+        }
+    }
+    
+    this.clearFilter = () =>{
+        this.IIR = false
+    }
+    
+    
     this.updateGraph = () => {
         for(var name in this.Node){
-            this.Node[name].path.attr('d',this.line);
+            if(this.Node[name].vis){
+                this.Node[name].path.attr('display','')
+                this.Node[name].path.attr('d',this.line);
+            }else{
+                this.Node[name].path.attr('display','none')
+            }
         }
         this.xaxis.transition()
             .duration(0)

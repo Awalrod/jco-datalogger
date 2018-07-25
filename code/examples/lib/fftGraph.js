@@ -1,9 +1,9 @@
 function FFTGraph(width, height, id){
-    this.desiredSize = 2**9 //powers of 2 work best
+    this.desiredSize = 2**9 //powers of 2 work best 2**9=512 2**10=1024
     this.difs = new Array(this.desiredSize/4) //rolling average to calculate sample rate
-    this.data = d3.range(1).map(function(){
-        return [0,0]
-    })
+    //this.data = d3.range(1).map(function(){
+    //    return [0,0]
+    //})
     this.mag_list = []
     this.x = d3.scale.linear()
         .domain([0,100])
@@ -36,13 +36,105 @@ function FFTGraph(width, height, id){
         .attr('class','y axis')
         .call(this.y.axis = d3.svg.axis().scale(this.y).orient('right'))
     this.paths = this.svg.append('g')
-    this.path = this.paths.append('path')
-        .data([this.data])
+    
+    
+    //this.path = this.paths.append('path')
+    //    .data([this.data])
         //.style('stroke','red')
         //.style('fill','none') //Do it in css
+    
+    
+
     this.label = this.svg.append("text")
     this.lastDate = new Date(Date.now())//used for difs
-    this.updateData = (event) =>{
+    
+    //Unlike with streamGraph, we're doing 'heavy' calculations, so we keep a channel list instead of 
+    // recalculating the paths every update. Can't afford to fft at 200hz
+    this.chList = []
+    this.updateData = (chWithColor) =>{
+        
+        for(i in chWithColor){
+            ch = chWithColor[i][0]
+            color = chWithColor[i][1]
+            path = this.findPathById('#'+ch.name)
+            if(path==null){
+                this.paths.append('path')
+                    .style('stroke',color)
+                    .attr('id',ch.name)
+                    .attr('class','group')
+                this.chList.push(ch)
+            }
+        }
+    }
+    this.findPathById = (pathId)=>{
+        path = this.paths.select(pathId)
+        if(path[0][0]===null){
+            return null
+        }else{
+            return path
+        }
+    }
+    this.removePath = (pathId)=>{
+        path = this.findPathById(pathId)
+        if(path != null){
+            for(i in this.chList){
+                if(path[0][0].id == this.chList[i].name){
+                    this.chList.splice(i,1)
+                }
+            }
+            path.remove()
+        }
+    }
+    
+    //This is when we actually calculate the fft
+    this.updateGraph = () =>{
+        f_axis = null
+        empty_imag = new Array(this.desiredSize).fill(0)
+        for(i in this.chList){
+            ch = this.chList[i]
+            if(ch.data.length >= this.desiredSize){
+                dif = 0
+                for(i in ch.data){
+                    if(i>0){
+                        t1 = ch.data[i][0] //timestamp
+                        t0 = ch.data[i-1][0]
+                        dif = ((dif*i-1)+Math.abs(t1-t0))/i //rolling average
+                    }
+                }
+                sr = 1000/dif
+                if(f_axis == null){
+                    f_axis = new Array(this.desiredSize/2).fill(0).map((d,i)=>{
+                        return i*(sr/2)/(this.desiredSize/2)
+                    })
+                }
+                ch_fft = ch.data.map((d)=>{
+                    return d[1]
+                })
+                
+                ch_fft = ch_fft.slice(-this.desiredSize)//make sure no reference to original and only use right amount 
+                ch_imag = empty_imag.slice()
+                
+                transform(ch_fft, ch_imag) // transform is located in fft.js
+                ch_mod = ch_fft.map((d,i)=>{
+                    return Math.sqrt(d**2+ch_imag[i]**2)
+                })
+                ch_mod_half = ch_mod.slice(0,ch_mod.length/2)
+                ch_zipped = f_axis.map((d,i)=>{
+                    return [d,ch_mod_half[i]]
+                })
+                this.x.domain([0,f_axis[f_axis.length-1]])
+                path = this.paths.select('#'+ch.name)
+                    .data([ch_zipped])
+                    .attr('d',this.line)
+                this.xaxis.transition()
+                    .duration(0)
+                    .ease('linear')
+                    
+            }
+        }   
+    }
+    
+    /*this.updateData = (event) =>{
         now = new Date(Date.now())
         dif = now-this.lastDate
         this.lastDate = now
@@ -90,7 +182,7 @@ function FFTGraph(width, height, id){
             this.mag_list = []        
         }
         
-    }
+    }*/
     this.getMax = (numList) =>{
         var max = numList[0]
         i=0

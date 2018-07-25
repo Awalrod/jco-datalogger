@@ -6,37 +6,7 @@ function StreamGraph(width,height,id){
     this.width=width
     this.height=height
     this.limit = 2000
-   
-    this.Node={
-        x:{
-            vis: true,
-            z0: 0,//for iir filter
-            data: d3.range(this.limit).map(function() {
-                return [Date.now(),0] //[time,val]
-            })
-        },
-        y:{
-            vis: true,
-            z0: 0,
-            data: d3.range(this.limit).map(function() {
-                return [Date.now(),0]
-            })
-        },
-        z:{
-            vis:true,
-            z0: 0,
-            data: d3.range(this.limit).map(function() {
-                return [Date.now(),0]
-            })
-        },
-        mag:{
-            vis:false,
-            z0:0,
-            data: d3.range(this.limit).map(function() {
-                return [Date.now(),0]
-            }) 
-        }
-    }
+    
     this.x = d3.time.scale()
         .domain([Date.now()-10000, Date.now()])
         .range([0, width])
@@ -66,7 +36,7 @@ function StreamGraph(width,height,id){
     this.yaxis = this.svg.append('g')
             .attr('class','y axis')
             .call(this.y.axis = d3.svg.axis().scale(this.y).orient('right'))
-
+    
 
     this.h1=this.min
     this.h2=this.max
@@ -127,6 +97,22 @@ function StreamGraph(width,height,id){
     this.setGuides = (y1,y2)=>{
         this.h1 = y1<y2? y1:y2
         this.h2 = y1>y2? y1:y2
+        
+        tickMarks = this.yaxis.selectAll('.tick text')[0].map((d)=>{
+            return Number(d.textContent.replace(",",""))    
+        })
+        
+        range = this.max-this.min
+        radius = range*.02
+        for(i in tickMarks){
+            if(Math.abs(this.h1-tickMarks[i]) < radius){
+                this.h1 = tickMarks[i]
+            }
+            if(Math.abs(this.h2-tickMarks[i]) <radius){
+                this.h2 = tickMarks[i]
+            }
+        }
+        
         this.redrawGuides()
     }
     this.updateBounds= (lower,upper)=>{
@@ -135,149 +121,64 @@ function StreamGraph(width,height,id){
             .duration(0)
             .ease('linear')
             .call(this.y.axis)
+        this.ticks = this.yaxis.selectAll('.tick')
         this.min = lower
         this.max = upper
         this.redrawGuides()
         this.updateGraph()
+        
     }
             
     this.paths = this.svg.append('g')
+    
 
-    for (var name in this.Node) {
-            this.Node[name].path = this.paths.append('path')
-                    .data([this.Node[name].data])
-                    .attr('class', name + ' group')
-                    .attr('data-legend',function(d){return name.slice()})
-//                    .style('stroke', this.Node[name].color)
+
+    
+    this.updateData = (chWithColor) => { 
+    /*
+     * chWithColor = [[ch,color],[ch,color]...]
+     */     
+        now = Date.now()              
+        for(i in chWithColor){
+            ch = chWithColor[i][0]
+            color = chWithColor[i][1]
+            path = this.findPathById('#'+ch.name)
+            if(path == null){
+                this.paths.append('path')
+                    .data([ch.data]) // MIGHT NEED BRACKETS
+                    .style('stroke',color)
+                    .attr('id',ch.name)
+                    .attr('class','group')
+                    
+            }
+        }
+        this.x.domain([now-(10*1000),now])//ten second domain
     }
     
-    this.legend = this.svg.append("g")
-      .attr("class","legend")
-      .attr("transform","translate(80,20)")
-      .attr("data-style-padding",5)
-      .style("font-size","12px")
-      .style("font-color","black")
-      .style("fill","white")
-      .style("stroke","black")
-      .call(d3.legend)
-
-
-    
-    this.updateData = (event) => { 
-        now = new Date(Date.now())
-        var sensorData = JSON.parse(event.data)
-        sumOfSquares = 0
-        for(name in sensorData){
-            d = sensorData[name]
-            sumOfSquares += d**2
+    this.findPathById = (pathId)=>{
+        path = this.paths.select(pathId)
+        if(path[0][0]===null){
+            return null
+        }else{
+            return path
         }
-        mag = Math.round(Math.sqrt(sumOfSquares))
-        sensorData["mag"]=mag
+    }
+    
+    this.removePath = (pathId)=>{
+        path = this.findPathById(pathId)
+        if(path!=null){
+            path.remove()
+        }	
+        this.updateGraph()
         
-        sensorData = this.filter(sensorData)
-        for( var name in this.Node){
-            group = this.Node[name]
-            group.data.push([now,sensorData[name]])
-            if(group.data.length>this.limit){
-                group.data.shift()
-            }
-        }               
-        this.x.domain([now-(10*1000),now])
     }
-    
-    this.IIR = false;
-    this.alpha = .9
-    this.filter = (sensorData) =>{
-        if(this.IIR){
-            newSensorData={}//empty object
-            for(var name in this.Node){
-                group = this.Node[name]
-                dataIn = sensorData[name]
-                z0 = group.z0
-                z1 = this.alpha*z0+(1-this.alpha)*dataIn
-                newSensorData[name] = dataIn-z1
-                group.z0=z1
-            }
-            return newSensorData
-        }//add more as needed
-        else{
-            return sensorData
-        }
-    }
-    
-    this.clearFilter = () =>{
-        this.IIR = false
-    }
-    
-    
     this.updateGraph = () => {
-        for(var name in this.Node){
-            if(this.Node[name].vis){
-                this.Node[name].path.attr('display','')
-                this.Node[name].path.attr('d',this.line);
-            }else{
-                this.Node[name].path.attr('display','none')
-            }
-        }
+        this.paths.selectAll('path').attr('d',this.line)
         this.xaxis.transition()
             .duration(0)
             .ease('linear')
             .call(this.x.axis)
-    }
-    
+    }    
 
 }
-
-
-(function() {
-d3.legend = function(g) {
-  g.each(function() {
-    var g= d3.select(this),
-        items = {},
-        svg = d3.select(g.property("nearestViewportElement")),
-        legendPadding = g.attr("data-style-padding") || 5,
-        lb = g.selectAll(".legend-box").data([true]),
-        li = g.selectAll(".legend-items").data([true])
-
-    lb.enter().append("rect").classed("legend-box",true)
-    li.enter().append("g").classed("legend-items",true)
-
-    svg.selectAll("[data-legend]").each(function() {
-        var self = d3.select(this)
-        items[self.attr("data-legend")] = {
-          pos : self.attr("data-legend-pos") || this.getBBox().y,
-          color : self.attr("data-legend-color") != undefined ? self.attr("data-legend-color") : self.style("fill") != 'none' ? self.style("fill") :self.style("stroke")
-        }
-      })
-
-    items = d3.entries(items).sort(function(a,b) { return a.value.pos-b.value.pos})
-
-
-    li.selectAll("text")
-        .data(items,function(d) { return d.key})
-        .call(function(d) { d.enter().append("text")})
-        .call(function(d) { d.exit().remove()})
-        .attr("y",function(d,i) { return i+"em"})
-        .attr("x","1em")
-        .text(function(d) { ;return d.key})
-
-    li.selectAll("circle")
-        .data(items,function(d) { return d.key})
-        .call(function(d) { d.enter().append("circle")})
-        .call(function(d) { d.exit().remove()})
-        .attr("cy",function(d,i) { return i-0.25+"em"})
-        .attr("cx",0)
-        .attr("r","0.4em")
-        .style("fill",function(d) { return d.value.color})  
-
-    // Reposition and resize the box
-    var lbbox = li[0][0].getBBox()  
-    lb.attr("x",(lbbox.x-legendPadding))
-        .attr("y",(lbbox.y-legendPadding))
-        .attr("height",(lbbox.height+2*legendPadding))
-        .attr("width",(lbbox.width+2*legendPadding))
-  })
-  return g
-}
-})()
 

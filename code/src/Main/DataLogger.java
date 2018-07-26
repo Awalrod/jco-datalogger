@@ -99,9 +99,9 @@ public class DataLogger
 	
 	private StreamServer streamServer;
 	private ConstantListener cl;
-	
 	private Controller controller;
 	public ControllerServer controllerServer;
+	
 	//Weird args4j stuff here
 	@Option(name="-l",aliases={"--length"},usage="Maximum number of sample lines per data file",forbids={"-i"})
 	public Integer fileLength = 1000;
@@ -1364,7 +1364,9 @@ public class DataLogger
 	*/
 	public static void main(String args[])
 	{
+		
 		DataLogger dl = new DataLogger(args);
+		debugPrint("reached here");
 		//debugPrint("exit");
 		//System.exit(0);
 	}

@@ -1293,7 +1293,7 @@ public class DataLogger
 			recordingStatus = false;
 			
 			controller = new Controller(this);
-			
+			controller.setSampleRate(50);
 			
 			try
 			{

@@ -1342,15 +1342,16 @@ public class DataLogger
 
 
 	//Shuts down everything
-	void gracefulShutdown()
+	public void gracefulShutdown()
 	{
+		debugPrint("gracefulShutdown");
 		coListener.stopSyncListener();
-		//fileHandler.close(); //stopSyncListener makes a call to fileHandler.close, so this is unnecessary
 		coThread.interrupt();
-		socketListener.closeConnection();
-		socketThread.interrupt();
+		//socketListener.closeConnection();
+		//socketThread.interrupt();
 		try{
 			streamServer.stop();
+			controllerServer.stop();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -1365,8 +1366,15 @@ public class DataLogger
 	public static void main(String args[])
 	{
 		
-		DataLogger dl = new DataLogger(args);
-		debugPrint("reached here");
+		final DataLogger dl = new DataLogger(args);
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			@Override
+			public void run()
+			{
+				dl.gracefulShutdown();	
+			}
+		});
 		//debugPrint("exit");
 		//System.exit(0);
 	}

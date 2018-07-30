@@ -1024,6 +1024,7 @@ public class DataLogger
 					controller.setBusMasterPort(Integer.decode(busMasterPort));
 					controllerServer = new ControllerServer(controllerAddress,Integer.decode(controllerPort),controller);
 					controllerServer.start();
+					controller.setSampleRate(50); //default. possible make this configurable in the future
 				}catch(Exception e){
 					System.out.println("Error starting Conroller server");
 				}
@@ -1293,7 +1294,7 @@ public class DataLogger
 			recordingStatus = false;
 			
 			controller = new Controller(this);
-			controller.setSampleRate(50);
+			//controller.setSampleRate(50);
 			
 			try
 			{

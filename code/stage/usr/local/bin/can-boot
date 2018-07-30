@@ -1,0 +1,44 @@
+#!/bin/bash
+case "$1" in
+    start)
+ 	/usr/local/bin/can-socat-setup >/dev/null 2>&1 &
+ 	sleep 1
+	/usr/local/bin/busmaster >/dev/null 2>&1 & 
+	sleep 1
+	/usr/local/bin/data-logger  >/dev/null 2>&1 &
+    	socatID=`pgrep can-socat-setup`
+    	busMasterID=`pgrep -f 'DS401_Master'`
+    	javaID=`pgrep -f 'java.*jco-dl'`
+    	bash /usr/bin/upsAddPid.sh $socatID
+    	bash /usr/bin/upsAddPid.sh $busMasterID
+    	bash /usr/bin/upsAddPid.sh $javaID
+    	;;
+    stop)
+    	pkill -f 'socat.*INTERFACE:can'
+    	pkill DS401_Master
+    	pkill -f 'java.*jco-dl'
+	;;
+    status)
+    	socatID=`pgrep -d', ' -f 'socat.*INTERFACE:can'`
+    	busMasterID=`pgrep -f 'DS401_Master'`
+    	javaID=`pgrep -f "java.*java.*jco-dl"`
+    	echo "Socat: $socatID"
+    	echo "Bus Master: $busMasterID"
+    	echo "Data-logger: $javaID"
+	;;
+    partial)
+    	nohup /usr/local/bin/can-socat-setup  >/dev/null 2>&1 &
+	sleep 1
+	nohup /usr/local/bin/busmaster  >/dev/null 2>&1 & 
+	sleep 1
+    	;;	
+    *)
+    	echo "Usage: can-boot {start|stop|status|partial}"
+    	echo "can-boot start : Full startup"
+    	echo "can-boot stop : Full stop"
+    	echo "can-boot status: List PIDs"
+    	echo "can-boot partial: Start Socat and Busmaster"
+    	exit 1
+esac
+
+exit 0

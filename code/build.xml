@@ -22,6 +22,7 @@
 		<property name="src.dir" value="./src"/>
 		<property name="docs.dir" value="./docs"/>
 		<property name="lib.dir" value="${src.dir}/lib"/>
+		<property name="stage.dir" value="./stage"/>
 		<property name="packages"
 		value="Main.*,DataRecording.*,DataFormatting.*,Server.*"/>
 
@@ -33,7 +34,7 @@
 		<property name="build.dest" value="./build/classes"/>
 		<property name="build.docs" value="./build/docs"/>
 		<property name="build.javadocs" value="./build/javadocs"/>
-	
+		<property name="jar.name" value="${name}-${version}.jar"/>
 		
 		<property name="svn.dest" value="${src.dir}"/>
 		<property name="dist.dir" value="./dist"/>
@@ -154,7 +155,14 @@
 			</fileset>
 		</copy>
 	</target>
-
+	
+	
+	<!-- =================================================================== -->
+	<!-- Copies files to stage dir                                            -->
+	<!-- =================================================================== -->
+	<target name="stage" depends="package">
+		<copy file="${build.dir}/${jar.name}" tofile="${stage.dir}/usr/local/share/java/${jar.name}"/>
+	</target>
 
 	<!-- =================================================================== -->
 	<!-- Compiles the source directory                                       -->
@@ -185,7 +193,7 @@
 	<!-- Creates the class package                                           -->
 	<!-- =================================================================== -->
 	<target name="package" depends="compile">
-		<echo message="Creating the jar file ${build.dir}/${name}.jar"/>
+		<echo message="Creating the jar file ${build.dir}/${jar.name}"/>
                 <tstamp>
                 	<format property="timestamp" pattern="yyyy-MM-dd"/>
                 </tstamp>
@@ -196,7 +204,7 @@
 			<arg value="-n"/>
 		</exec>
 		
-		<jar jarfile="${build.dir}/${name}-${version}.jar"
+		<jar jarfile="${build.dir}/${jar.name}"
 		basedir="${build.dest}">
 			<fileset dir="${build.dest}"
 			includes="org/**,com/**,hyph/**,**/*.class"/>

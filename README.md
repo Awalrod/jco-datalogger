@@ -112,14 +112,7 @@ Options:
 Currently the controller for the data recording portion of the application
 sits on a websocket server at port 7331. Here are valid commands:  
 + `recording=start`: Starts recording .csv files.  
-+ `recording=stop`: Stops recording .csv files.
-<!---+ `status\n`: Returns a brief status message that includes:  
-	Recording/Not Recording  
-	Samples per file  
-	Base Filename  
-	Start time (if recording)  
-	Runtime (if recording)
---->  
++ `recording=stop`: Stops recording .csv files.  
 + `numSamples=$sampleSize`: Sets the number of samples(lines after header info) in each .csv file, where `$sampleSize` is the desired amount.
 + `fileName=$fileName`: Sets the base file name for the .csv files. The logger will append three digits (`000`,`001`,etc) at the end of each file as new files are created.  
 + `clearData`: Deletes any .csv files in the set data directory. Be careful when using this. The data directory is set with the `-dir` option at startup. 
@@ -151,7 +144,7 @@ dictionary. Example of changing the sample rate:
 </config>`  
 Where `$val` is the desired time interval between samples in microseconds.  
 
-The WebSocket server sits at port 7333 and accepts commands to control the data stream.
+The WebSocket server for the actual stream sits at port 7333 and also accepts commands to control the data stream.
 + `stream=true/false`: Turns streaming on or off
 + `nodeid=$nodeid`: Changes nodeData that gets streamed. `$nodeId` is the index of the node in the list of nodes provided in `loggerconfig.xml`, NOT the actual node ID.  
 + `nodeid=all` will send all the node data.  
@@ -165,4 +158,8 @@ The canopen-raspberrypi project(which this application sits on top of) can
 be found [here](https://github.com/mpcrowe/canopen-raspberrypi).  
 
 The WebSocket implementation used can be found
-[here](https://github.com/TooTallNate/Java-WebSocket). 
+[here](https://github.com/TooTallNate/Java-WebSocket).  
+
+A web interface example can be found 
+[here](https://github.com/Awalrod/frontend-jco-datalogger).  
+ 

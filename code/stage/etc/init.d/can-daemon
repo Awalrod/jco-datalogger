@@ -14,7 +14,6 @@
 export _SYSTEMCTL_SKIP_REDIRECT=1
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-JAVA_HOME=/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/jre
 
 . /lib/lsb/init-functions
 

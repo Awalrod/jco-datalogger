@@ -40,6 +40,7 @@ public class Streamer{
             try{
                 if(jsonText!=null){
                     conn.send(jsonText);
+//System.out.println("*"+jsonText+"*");
                 }
             }
             catch(Exception e){

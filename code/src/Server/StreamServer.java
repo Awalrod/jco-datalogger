@@ -63,32 +63,38 @@ public class StreamServer extends WebSocketServer {
 
 	@Override //from WebSocketServer
 	public void onMessage( WebSocket conn, String message ) {
-		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + message );
+		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ":s (" + message + ")" );
 		if(message.contains("nodeid=")){
 			if(message.contains("all")){
 				getStreamByConn(conn).setStreamAll(true);
-			}else{
+			}
+			else
+			{
 				Integer nodeId = Integer.decode(message.substring(7));
 				getStreamByConn(conn).setNodeId(nodeId);
 				getStreamByConn(conn).setStreamAll(false);
 			}
-		}else{
-			switch(message){
-				case "stream=true":
-					getStreamByConn(conn).setStreaming(true);
-					break;
-				case "stream=false":
-					getStreamByConn(conn).setStreaming(false);
-					break;
-				default:
-				
-					break;	
-			}
+		}
+		else if(message.contains("stream="))
+		{
+			if( message.contains("stream=true"))
+				getStreamByConn(conn).setStreaming(true);
+			else if( message.contains("stream=false"))
+				getStreamByConn(conn).setStreaming(false);
+			else
+				System.out.println("stream uknown type");
+		}
+		else
+		{
+			System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": unknown message (" + message + ")" );
+			conn.send("unknown command");
 		}
 	}
+	
+	
 	@Override
 	public void onMessage( WebSocket conn, ByteBuffer message ) {
-		System.out.println( "BYtebuffer"+ conn + ": " + message );
+		System.out.println( "BYtebuffer"+ conn + ":b (" + message + ")" );
 	}
 
 
@@ -120,9 +126,12 @@ public class StreamServer extends WebSocketServer {
 		System.out.println("Server started!");
 	}
 	
-	public void stream(AccelerometerReading readings[]){
-		synchronized(streams){
-			for(Streamer s: streams){
+	public void stream(AccelerometerReading readings[])
+	{
+		synchronized(streams)
+		{
+			for(Streamer s: streams)
+			{
 				s.stream(readings);
 			}
 		}	

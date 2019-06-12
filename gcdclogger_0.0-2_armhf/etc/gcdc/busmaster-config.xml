@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+	<can_fest>
+		<lib>libcanfestival_can_socket.so</lib>
+		<interface>can0</interface>
+		<baud>500K</baud>
+	</can_fest>
+	<slave_nodes>
+		<node id="a2"><name>device 2</name><nodeid>0x02</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x182</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+			                                                                                   
+		</node>
+		<node id="a3"><name>device 3</name><nodeid>0x03</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x183</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+
+		<node id="a4"><name>device 4</name><nodeid>0x04</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x184</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+
+		<node id="a5"><name>device 5</name><nodeid>0x05</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x185</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+		
+
+		<node id="a6"><name>device 6</name><nodeid>0x06</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x186</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+		
+
+		<node id="a7"><name>device 7</name><nodeid>0x07</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x187</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+		
+
+		<node id="a8"><name>device 8</name><nodeid>0x08</nodeid>
+			<pdo type="tx" num="1">
+				<cobid>0x188</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="tx" num="1">
+				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+
+		<node id="d23"><name>datalogger</name><nodeid>0x23</nodeid>
+			<pdo type="rx" num="1">
+				<cobid>0x188</cobid>
+				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+			</pdo> 
+			<pdo_map type="rx" num="1">
+				<map><index>0x6217</index><subindex>1</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x6217</index><subindex>2</subindex><num_bits>20</num_bits></map> 
+			        <map><index>0x6217</index><subindex>3</subindex><num_bits>20</num_bits></map> 
+			</pdo_map>
+		</node>
+		
+		<node id="mast_mon">
+			<name>Master Monitor Node</name>
+			<nodeid>0x66</nodeid>
+			<heartbeat_time>0x1234</heartbeat_time>
+			<pdo type="tx" num="1">
+				<cobid>0x1E6</cobid>
+				<transmission_type>0xff</transmission_type>
+				<inhibit_time></inhibit_time>
+				<event_timer>4000</event_timer>
+			</pdo>
+			<pdo type="tx" num="2">
+				<cobid>0x2E6</cobid>
+				<transmission_type>0xff</transmission_type>
+				<inhibit_time>1000</inhibit_time>
+				<event_timer>4000</event_timer>
+			</pdo>
+			<pdo type="tx" num="3">
+				<cobid>0x800003E6</cobid>
+			</pdo>
+			<pdo type="tx" num="4">
+				<cobid>0x800004E6</cobid>
+			</pdo>
+			<pdo type="rx" num="1">
+				<cobid>0x266</cobid>
+				<transmission_type>0xff</transmission_type>
+<!--				<inhibit_time>0x5a5a</inhibit_time>
+				<event_timer>4000</event_timer>
+-->
+			</pdo>
+
+			<pdo_map type="tx" num="2">
+				<map><index>0x6401</index><subindex>1</subindex><num_bits>16</num_bits></map>
+				<map><index>0x6401</index><subindex>2</subindex><num_bits>16</num_bits></map>
+				<map><index>0x6401</index><subindex>3</subindex><num_bits>16</num_bits></map>
+			</pdo_map>
+			<obj_dict><index>0x6202</index><subindex>1</subindex><type>int8</type>
+				<val>0x12</val>
+			</obj_dict>
+			<obj_dict><index>0x1016</index><subindex>2</subindex><type>int32</type>
+				<val>0x12345678</val>
+			</obj_dict>
+			<obj_dict><index>0x1006</index><subindex>0</subindex><type>int32</type>
+				<val>500000</val>
+			</obj_dict>
+<!--			<obj_dict><index>0x1008</index><subindex>0</subindex><type>visible_string</type>
+				<val>Hello</val>
+			</obj_dict>
+-->
+		</node>
+
+		<node id="java_test">
+			<name>Java Test.class</name>
+			<nodeid>0x23</nodeid>
+			<heartbeat_time>0x1234</heartbeat_time>
+		</node>
+	</slave_nodes>
+</config>

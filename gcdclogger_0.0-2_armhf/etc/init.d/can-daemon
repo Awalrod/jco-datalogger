@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+### BEGIN INIT INFO
+# Provides:          can-daemon
+# Required-Start:    $remote_fs $syslog apache2
+# Required-Stop:     $remote_fs $syslog apache2
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start busmaster and data logger
+# Description:       Enable service provided busmaster and data logger
+### END INIT INFO
+
+export _SYSTEMCTL_SKIP_REDIRECT=1
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /lib/lsb/init-functions
+
+NAME=can-boot
+DAEMON=/usr/local/bin/${NAME}
+PIDFILE=/tmp/can-boot.pid
+
+test -x $DAEMON || exit 5
+
+${DAEMON} $1
+

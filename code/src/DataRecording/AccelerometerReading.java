@@ -7,7 +7,7 @@ package DataRecording;
 public class AccelerometerReading
 {
 	private int x,y,z;
-
+	private String id;
 	/**
 	*
 	* @param elapsedTime Time from initial sync
@@ -22,6 +22,7 @@ public class AccelerometerReading
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		id = "Default";
 	}
 
 	public AccelerometerReading( int[] data)
@@ -29,6 +30,7 @@ public class AccelerometerReading
 		this.x = data[0];
 		this.y = data[1];
 		this.z = data[2];
+		id ="Default";
 	}
 
 

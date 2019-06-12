@@ -33,6 +33,9 @@ public class AccelerometerReading
 		id ="Default";
 	}
 
+	public void setID(String newID){
+		id = newID;
+	}
 
 	public int getX()
 	{

@@ -79,7 +79,10 @@ public class NodeTracker
 			System.out.println(";Could not read subentry 0x"+Integer.toHexString(destIndex <<8));
 			e.printStackTrace();
 		}
-		return( new AccelerometerReading(data));
+	AccelerometerReading ar = new AccelerometerReading(data);
+	String sid = Integer.toHexString(nodeId);
+	ar.setID(sid);
+	return( ar);
 	}
 
 

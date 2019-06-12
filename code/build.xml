@@ -198,7 +198,7 @@
                 	<format property="timestamp" pattern="yyyy-MM-dd"/>
                 </tstamp>
                 
-                <exec executable="/usr/bin/svnversion"
+                <exec executable="gitversion.sh"
                 failifexecutionfails="no" dir="${svn.dest}"
                 outputproperty="svn.revision">
 			<arg value="-n"/>

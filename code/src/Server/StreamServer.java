@@ -78,7 +78,10 @@ public class StreamServer extends WebSocketServer {
 		else if(message.contains("stream="))
 		{
 			if( message.contains("stream=true"))
+			{
+				System.out.println("streaming set to true");
 				getStreamByConn(conn).setStreaming(true);
+			}
 			else if( message.contains("stream=false"))
 				getStreamByConn(conn).setStreaming(false);
 			else

@@ -130,7 +130,7 @@ public class DataFormatter
 			String name = nodes.get(i).getName();
 			headerLabels = headerLabels.concat(name+"X,");
 			headerLabels = headerLabels.concat(name+"Y,");
-			headerLabels = headerLabels.concat(name+"ZZ, ");
+			headerLabels = headerLabels.concat(name+"Z, ");
 		}
 
 		header = header.concat(headerLabels); //no newline intentionally
@@ -153,7 +153,7 @@ public class DataFormatter
 		for(AccelerometerReading reading : readings)
 		{
 			output.append(", ");
-			output.append(reading.toStringBuilder());
+			output.append(reading.toString());
 		}
 		return(output.toString());
 	}

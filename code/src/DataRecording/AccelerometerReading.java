@@ -56,17 +56,17 @@ public class AccelerometerReading
 
 	public String toString()
 	{
-		return String.format("X: %d, Y: %d, Z: %d\n",x,y,z);
+		return String.format("XYZ: %d, %d, %d\n",x,y,z);
 	}
 	
 	public StringBuilder toStringBuilder()
 	{
 		StringBuilder output = new StringBuilder(100);
 		output.append(x);
-		output.append(",");
-		output.append(y);
-		output.append(",");
-		output.append(z);
+		output.append(","); //
+		output.append(y);   //
+		output.append(","); //
+		output.append(z);   //
 		return(output);
 	}
 }

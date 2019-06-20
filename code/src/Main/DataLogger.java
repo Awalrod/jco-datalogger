@@ -887,7 +887,7 @@ public class DataLogger
 		String numSamples;
 		boolean bBitsSample = false;
 		String bitsSample;
-		private int rxPdoCtlMapIndex = 0x11;
+		private int rxPdoCtlMapIndex = 0x01;
 		boolean bStream = false;
 		boolean bStreamAddress = false;
 		boolean bStreamPort = false;
@@ -1069,7 +1069,8 @@ public class DataLogger
 
 						debugPrint("node parameters odIndex:("+odIndex+ ") cobid:("+cobid+ ") numSamples:("+ numSamples +") bits per sample:("+ bitsSample+")");
 
-						nodes.add( new NodeTracker(canOpen, sName, cobId, rxPdoCtlMapIndex++, iOdIndex, 0x3, bits, 0,1,2));
+						//nodes.add( new NodeTracker(canOpen, sName, cobId, rxPdoCtlMapIndex++, iOdIndex, 0x3, bits, 0,1,2));
+						nodes.add( new NodeTracker(canOpen, sName, cobId, cobId - 0x180, iOdIndex, 0x3, bits, 0,1,2));
 					}
 				}
 				else if(qName.equalsIgnoreCase("channels")) {

@@ -1,18 +1,20 @@
 package DataRecording;
 
-import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import com.google.gson.*;
 
 public class AccelerometerSet {
 
 	private String type;
-	private double ts;
+	private String ts;
 	private AccelerometerReading data[];
 
 	public AccelerometerSet(AccelerometerReading ar[]){
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		SimpleDateFormat timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date date = new Date();
 		type = "Accel1";
-		ts = timestamp.getTime();
+		ts = timestamp.format(date);
 		data = ar;
 	}
 

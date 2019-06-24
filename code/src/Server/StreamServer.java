@@ -1,5 +1,6 @@
 package Server;
 
+import java.net.InetAddress;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,6 +41,10 @@ public class StreamServer extends WebSocketServer {
 		super( address );
 	}
 	
+	public StreamServer(InetAddress host, int port) throws UnknownHostException{
+                super( new InetSocketAddress(host,port));
+        }
+
 	public StreamServer(String host, int port) throws UnknownHostException{
 		super( new InetSocketAddress(host,port));
 	}

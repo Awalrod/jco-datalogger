@@ -24,14 +24,17 @@ public class AccelerometerReading
 		this.y = y;
 		this.z = z;
 		id = "Default";
+
 	}
 
 	public AccelerometerReading( int[] data)
 	{
+
 		this.x = data[0];
 		this.y = data[1];
 		this.z = data[2];
 		id ="Default";
+
 	}
 
 	public void setID(String newID){

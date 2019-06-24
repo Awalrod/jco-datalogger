@@ -12,8 +12,19 @@ public class AccelerometerSet {
 	public AccelerometerSet(AccelerometerReading ar[]){
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		type = "Accel1";
+		int i;
+		int j = 0;
+		for(i = 0; i<ar.length; i++){
+			if(ar[i] == null)
+				break;
+			j++;
+		}
+		data = new AccelerometerReading[j];
+		for(i=0; i<j; i++){
+			data[i] = ar[i];
+		}
 		ts = (timestamp.getTime() / 1000);
-		data = ar;
+		//data = ar;
 	}
 
 	public String toJson(){

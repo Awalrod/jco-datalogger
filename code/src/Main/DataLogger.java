@@ -227,7 +227,10 @@ public class DataLogger
 				AccelerometerReading readings[] = new AccelerometerReading[nodes.size()];
 				for(int i=0; i<nodes.size(); i++ )
 				{
-					readings[i] = nodes.get(i).getLatestReading();
+					AccelerometerReading ar = nodes.get(i).getLatestReading();
+					if(ar != null)
+						readings[i] = ar;
+//nodes.get(i).getLatestReading();
 				}
 //				long nanoFmtStart = System.nanoTime();
 				String formattedLine = dfmt.produceOutputLine(elapsedTimeNs, readings);
@@ -293,9 +296,13 @@ public class DataLogger
 	private class ConstantListener implements CanOpenListener{
 		public void onMessage(CanMessage canMeassage){
 			AccelerometerReading readings[] = new AccelerometerReading[nodes.size()];
+			int j=0;
 			for(int i=0; i<nodes.size(); i++ )
 			{
-				readings[i] = nodes.get(i).getLatestReading();
+				//readings[i] = nodes.get(i).getLatestReading();
+				AccelerometerReading ar = nodes.get(i).getLatestReading();
+                                if(ar != null)
+                                	readings[j++] = ar;
 			}
 			//debugPrint(dfmt.produceJsonString(readings));
 			streamServer.stream(readings);
@@ -1001,7 +1008,7 @@ public class DataLogger
 				cot.od = DefaultOD.create(iAddr);
 				//                              nodeId,  type, heartbeatMs,vendorId,productId, revisionNum, serialNum
 //				cot.od = DefaultOD.createStandardDict(iAddr, 0x0, 5000, 0x0000029C, 0x19, 0x11, 0x1234 );
-				                                                          
+
 				canOpen = new CanOpen(cot.drvr, cot.od, iAddr, GlobalVars.DEBUG);
 			}
 			else if(qName.equalsIgnoreCase("channels")) {
@@ -1069,8 +1076,13 @@ public class DataLogger
 
 						debugPrint("node parameters odIndex:("+odIndex+ ") cobid:("+cobid+ ") numSamples:("+ numSamples +") bits per sample:("+ bitsSample+")");
 
-						//nodes.add( new NodeTracker(canOpen, sName, cobId, rxPdoCtlMapIndex++, iOdIndex, 0x3, bits, 0,1,2));
-						nodes.add( new NodeTracker(canOpen, sName, cobId, cobId - 0x180, iOdIndex, 0x3, bits, 0,1,2));
+						NodeTracker possibleNode = new NodeTracker(canOpen, sName, cobId, cobId - 0x180, iOdIndex, 0x3, bits, 0,1,2);
+						//for(int i = 0; i < 10; i++) possibleNode.getLatestReading();
+						//if (possibleNode.getLatestReading().getX() != 0){
+							//nodes.add( new NodeTracker(canOpen, sName, cobId, rxPdoCtlMapIndex++, iOdIndex, 0x3, bits, 0,1,2));
+							nodes.add(possibleNode);
+							//nodes.add( new NodeTracker(canOpen, sName, cobId, iOdIndex, iOdIndex, 0x3, bits, 0,1,2));
+						//}
 					}
 				}
 				else if(qName.equalsIgnoreCase("channels")) {

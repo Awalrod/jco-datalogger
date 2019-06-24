@@ -82,7 +82,10 @@ public class NodeTracker
 	AccelerometerReading ar = new AccelerometerReading(data);
 	String sid = Integer.toHexString(nodeId);
 	ar.setID(sid);
-	return( ar);
+	if(ar.getX() != 0 && ar.getY() != 0 && ar.getZ() != 0)
+		return( ar);
+	else
+		return(null);
 	}
 
 

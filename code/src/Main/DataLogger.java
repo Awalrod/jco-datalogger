@@ -42,12 +42,18 @@ import java.util.TimerTask;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Enumeration;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -908,6 +914,35 @@ public class DataLogger
 		boolean bBusMasterPort;
 		String busMasterPort;
 		
+		public InetAddress getIPv4FromIFaceName(String name) throws SocketException{
+        		Enumeration<NetworkInterface> interfaces;
+        		interfaces = NetworkInterface.getNetworkInterfaces();
+        		while(interfaces.hasMoreElements()){
+                		NetworkInterface ni = interfaces.nextElement();
+                		if (!(ni.getName().contains(name)))
+                        		continue;
+        			Enumeration<InetAddress> ips = ni.getInetAddresses();
+                		while (ips.hasMoreElements()){
+                        		InetAddress ina = ips.nextElement();
+                        		if(ina.toString().contains("."))
+                                		return ina;
+                		}
+        		}
+        		return null;
+
+    		}
+
+    		public InetAddress getIPv4FromIFaceNameList(ArrayList<String> nameList) throws SocketException{
+        		Iterator<String> name = nameList.iterator();
+        		while(name.hasNext()){
+                		InetAddress ina = getIPv4FromIFaceName(name.next());
+                		if(ina != null)
+                        		return ina;
+        		}
+        		return null;
+    		}
+
+
 		CoXmlHandler(CanOpenThread cot)
 		{
 			this.cot = cot;
@@ -1018,7 +1053,13 @@ public class DataLogger
 			{
 				bStream = false;
 				try{
-					streamServer = new StreamServer(streamAddress,Integer.decode(streamPort));
+					ArrayList<String> als = new ArrayList<String>();
+					als.add(streamAddress);
+					als.add("wlan0");
+					als.add("eth0");
+					als.add("lo");
+					InetAddress i1 = getIPv4FromIFaceNameList(als);
+					streamServer = new StreamServer(i1,Integer.decode(streamPort));
 					streamServer.start();
 				}catch(Exception e){
 					System.out.println("Error starting stream server");

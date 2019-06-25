@@ -910,10 +910,10 @@ public class DataLogger
 		boolean bControllerAddress = false;
 		boolean bControllerPort = false;
 		String controllerAddress;
-		String controllerPort;	
+		String controllerPort;
 		boolean bBusMasterPort;
 		String busMasterPort;
-		
+
 		public InetAddress getIPv4FromIFaceName(String name) throws SocketException{
         		Enumeration<NetworkInterface> interfaces;
         		interfaces = NetworkInterface.getNetworkInterfaces();
@@ -936,8 +936,9 @@ public class DataLogger
         		Iterator<String> name = nameList.iterator();
         		while(name.hasNext()){
                 		InetAddress ina = getIPv4FromIFaceName(name.next());
-                		if(ina != null)
+                		if(ina != null){
                         		return ina;
+				}
         		}
         		return null;
     		}
@@ -1059,6 +1060,7 @@ public class DataLogger
 					als.add("eth0");
 					als.add("lo");
 					InetAddress i1 = getIPv4FromIFaceNameList(als);
+					System.out.println("Using "+i1.getHostAddress());
 					streamServer = new StreamServer(i1,Integer.decode(streamPort));
 					streamServer.start();
 				}catch(Exception e){

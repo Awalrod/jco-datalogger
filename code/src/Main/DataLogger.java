@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Enumeration;
+import java.util.StringTokenizer;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -1054,11 +1055,17 @@ public class DataLogger
 			{
 				bStream = false;
 				try{
+					StringTokenizer st = new StringTokenizer(streamAddress, ",");
 					ArrayList<String> als = new ArrayList<String>();
-					als.add(streamAddress);
-					als.add("wlan0");
-					als.add("eth0");
-					als.add("lo");
+					while (st.hasMoreTokens()){
+						String t2 = st.nextToken();
+						System.out.println("t2: "+t2);
+						als.add(t2);
+					}
+					//als.add(streamAddress);
+					//als.add("wlan0");
+					//als.add("eth0");
+					//als.add("lo");
 					InetAddress i1 = getIPv4FromIFaceNameList(als);
 					System.out.println("Using "+i1.getHostAddress());
 					streamServer = new StreamServer(i1,Integer.decode(streamPort));

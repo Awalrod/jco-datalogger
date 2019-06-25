@@ -2,7 +2,7 @@
 <config>
 	<can_driver>
 		<type>datagram</type>
-		<address>canbus</address>
+		<address>localhost</address>
 		<port>2000</port>
 	</can_driver>
 	<canopen_address>0x23</canopen_address>
@@ -63,7 +63,7 @@
 		<busmasterport>7332</busmasterport>
 	</controller>
 	<stream>
-		<address>canbus</address>
+		<address>eth0,wlan0,lo</address>
 		<port>7333</port>
 	</stream>	
 </config>

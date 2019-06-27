@@ -13,8 +13,10 @@ import org.java_websocket.WebSocketImpl;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.java_websocket.exceptions.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.gcdc.canopen.CanOpenListener;
 import com.gcdc.can.CanMessage;
@@ -138,9 +140,19 @@ public class StreamServer extends WebSocketServer {
 	{
 		synchronized(streams)
 		{
-			for(Streamer s: streams)
+			Iterator<Streamer> s1 = streams.iterator();
+			while(s1.hasNext())
 			{
-				s.stream(readings);
+				Streamer s = s1.next();
+				try{
+					s.stream(readings);
+				}
+				catch(WebsocketNotConnectedException e)
+				{
+					s.setStreaming(false);
+					System.out.println("removing stream because: "+e);
+//					streams.remove(s);
+				}
 			}
 		}	
 	}

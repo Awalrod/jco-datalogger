@@ -315,7 +315,9 @@ public class DataLogger
 			//debugPrint(dfmt.produceJsonString(readings));
 			Iterator<StreamServer> ss = streamServers.iterator();
 			while(ss.hasNext())
+			{
 				ss.next().stream(readings);
+			}
 		}
 		
 		public void onObjDictChange(SubEntry se){}
@@ -1060,24 +1062,26 @@ public class DataLogger
 				bStream = false;
 				try{
 					StringTokenizer st = new StringTokenizer(streamAddress, ",");
-					ArrayList<String> als = new ArrayList<String>();
-					while (st.hasMoreTokens()){
+					while (st.hasMoreTokens())
+					{
 						String t2 = st.nextToken();
 						System.out.println("t2: "+t2);
-						als.add(t2);
-					}
-					InetAddress i1 = getIPv4FromIFaceNameList(als);
-					System.out.println("Using "+i1.getHostAddress());
-					try
-					{
-						StreamServer streamServer = new StreamServer(i1,Integer.decode(streamPort));
-						streamServer.start();
-						streamServers.add(streamServer);
-					}
-					catch(IllegalStateException e2)
-					{
-						System.out.println("Error starting stream server");
-						e2.printStackTrace();
+						InetAddress i1 = getIPv4FromIFaceName(t2);
+						if(i1 ==null)
+							continue;
+
+						System.out.println("Using "+i1.getHostAddress());
+						try
+						{
+							StreamServer streamServer = new StreamServer(i1,Integer.decode(streamPort));
+							streamServer.start();
+							streamServers.add(streamServer);
+						}
+						catch(IllegalStateException e2)
+						{
+							System.out.println("Error starting stream server");
+							e2.printStackTrace();
+						}
 					}
 				}catch(Exception e){
 					System.out.println("Error");

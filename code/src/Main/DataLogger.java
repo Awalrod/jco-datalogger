@@ -104,7 +104,7 @@ public class DataLogger
 	public boolean recordingStatus;
 	private ReadableInstant startInstant;
 
-	private StreamServer streamServer;
+	private ArrayList<StreamServer> streamServers = new ArrayList<StreamServer>();
 	private ConstantListener cl;
 	private Controller controller;
 	public ControllerServer controllerServer;
@@ -301,6 +301,7 @@ public class DataLogger
 	
 	//This is for the stream
 	private class ConstantListener implements CanOpenListener{
+	
 		public void onMessage(CanMessage canMeassage){
 			AccelerometerReading readings[] = new AccelerometerReading[nodes.size()];
 			int j=0;
@@ -312,8 +313,11 @@ public class DataLogger
                                 	readings[j++] = ar;
 			}
 			//debugPrint(dfmt.produceJsonString(readings));
-			streamServer.stream(readings);
+			Iterator<StreamServer> ss = streamServers.iterator();
+			while(ss.hasNext())
+				ss.next().stream(readings);
 		}
+		
 		public void onObjDictChange(SubEntry se){}
 		public void onEvent(CanOpen canOpen){
 			/*if(canOpen.isResetNodeState())
@@ -1062,16 +1066,21 @@ public class DataLogger
 						System.out.println("t2: "+t2);
 						als.add(t2);
 					}
-					//als.add(streamAddress);
-					//als.add("wlan0");
-					//als.add("eth0");
-					//als.add("lo");
 					InetAddress i1 = getIPv4FromIFaceNameList(als);
 					System.out.println("Using "+i1.getHostAddress());
-					streamServer = new StreamServer(i1,Integer.decode(streamPort));
-					streamServer.start();
+					try
+					{
+						StreamServer streamServer = new StreamServer(i1,Integer.decode(streamPort));
+						streamServer.start();
+						streamServers.add(streamServer);
+					}
+					catch(IllegalStateException e2)
+					{
+						System.out.println("Error starting stream server");
+						e2.printStackTrace();
+					}
 				}catch(Exception e){
-					System.out.println("Error starting stream server");
+					System.out.println("Error");
 					e.printStackTrace();
 				}
 			}
@@ -1414,7 +1423,13 @@ public class DataLogger
 		//socketListener.closeConnection();
 		//socketThread.interrupt();
 		try{
-			streamServer.stop();
+			Iterator<StreamServer> ss = streamServers.iterator();
+			while(ss.hasNext())
+			{
+				ss.next().stop();
+				streamServers.remove(ss);
+			}
+
 			controllerServer.stop();
 		}catch(Exception e){
 			e.printStackTrace();

@@ -23,7 +23,7 @@ public class AccelerometerSet {
 		for(i=0; i<j; i++){
 			data[i] = ar[i];
 		}
-		ts = (timestamp.getTime() / 1000);
+		ts = (double)timestamp.getTime()/1000.0;
 		//data = ar;
 	}
 

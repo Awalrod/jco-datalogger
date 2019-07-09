@@ -22,7 +22,7 @@
 		<property name="src.dir" value="./src"/>
 		<property name="docs.dir" value="./docs"/>
 		<property name="lib.dir" value="${src.dir}/lib"/>
-		<property name="stage.dir" value="./stage"/>
+		<property name="stage.dir" value="."/>
 		<property name="packages"
 		value="Main.*,DataRecording.*,DataFormatting.*,Server.*"/>
 

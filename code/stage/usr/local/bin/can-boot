@@ -1,23 +1,126 @@
 #!/bin/bash
+
+
+### BEGIN INIT INFO
+# Provides:          can-daemon
+# Required-Start:    $remote_fs $syslog apache2
+# Required-Stop:     $remote_fs $syslog apache2
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start busmaster and data logger
+# Description:       Enable service provided busmaster and data logger
+### END INIT INFO
+
+
+export _SYSTEMCTL_SKIP_REDIRECT=1
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /lib/lsb/init-functions
+
+RUNASUSER=root
+PID_PATH=/var/run/datalogger
+
+NAME=can-socat-setup
+DAEMON=/usr/local/bin/${NAME}
+PIDFILE=${PID_PATH}/${NAME}.pid
+test -x $DAEMON || exit 5
+
+BM_NAME=busmaster
+BM_DAEMON=/usr/local/bin/${BM_NAME}
+BM_PIDFILE=${PID_PATH}/${BM_NAME}.pid
+test -x $BM_DAEMON || exit 5
+
+DL_NAME=data-logger
+DL_DAEMON=/usr/local/bin/${DL_NAME}
+DL_PIDFILE=${PID_PATH}/${DL_NAME}.pid
+test -x $DL_DAEMON || exit 5
+
+UGID=$(getent passwd $RUNASUSER | cut -f 3,4 -d:) || true
+if test "$(uname -s)" = "Linux"; then
+        NTPD_OPTS="$NTPD_OPTS -u $UGID"
+fi
+
+
+LOCKFILE=/var/lock/datalogger
+
+lock_mon() {
+        if [ -x /usr/bin/lockfile-create ]; then
+                lockfile-create $LOCKFILE
+                lockfile-touch $LOCKFILE &
+                LOCKTOUCHPID="$!"
+        fi
+}
+
+unlock_mon() {
+        if [ -x /usr/bin/lockfile-create ] ; then
+                kill $LOCKTOUCHPID
+                lockfile-remove $LOCKFILE
+        fi
+}
+
+
 case "$1" in
     start)
- 	/usr/local/bin/can-socat-setup >/dev/null 2>&1 &
- 	sleep 1
-	/usr/local/bin/busmaster >/dev/null 2>&1 & 
-	sleep 1
-	/usr/local/bin/data-logger  >/dev/null 2>&1 &
-    	socatID=`pgrep can-socat-setup`
-    	busMasterID=`pgrep -f 'DS401_Master'`
-    	javaID=`pgrep -f 'java.*jco-dl'`
-    	bash /usr/bin/upsAddPid.sh $socatID
-    	bash /usr/bin/upsAddPid.sh $busMasterID
-    	bash /usr/bin/upsAddPid.sh $javaID
+	if [ -z "$UGID" ]; then
+		log_failure_msg "user \"$RUNASUSER\" does not exist"
+		exit 1
+	fi
+	mkdir -p ${PID_PATH}
+
+	log_daemon_msg "Starting ${NAME} server using pidfile ${PIDFILE}" "${NAME}" || true
+	lock_mon
+	start-stop-daemon --start --pidfile ${PIDFILE} --background \
+		--startas /bin/bash -- -c """exec $DAEMON -p ${PIDFILE} 2>&1 | /usr/bin/logger --tag $NAME"""
+	status=$?
+	unlock_mon
+	log_end_msg $status
+# 	/usr/local/bin/can-socat-setup >/dev/null 2>&1 &
+
+# 	sleep 1
+	log_daemon_msg "Starting ${BM_NAME} server" "${BM_NAME}" || true
+	lock_mon
+	start-stop-daemon --start --pidfile $BM_PIDFILE --background \
+		--startas /bin/bash -- -c "exec $BM_DAEMON -p ${BM_PIDFILE} | /usr/bin/logger --tag $BM_NAME"
+	status=$?
+	unlock_mon
+	log_end_msg $status
+#	/usr/local/bin/busmaster >/dev/null 2>&1 & 
+
+#	sleep 1
+	log_daemon_msg "Starting ${DL_NAME} server" "${DL_NAME}" || true
+	lock_mon
+	start-stop-daemon --start --pidfile $DL_PIDFILE --background \
+		--startas /bin/bash -- -c """exec $DL_DAEMON -p ${DL_PIDFILE} 2>&1 | /usr/bin/logger --tag $DL_NAME"""
+	status=$?
+	unlock_mon
+	log_end_msg $status
     	;;
+    	
     stop)
+	log_daemon_msg "Stopping ${DL_NAME} server" "${DL_NAME}"
+	start-stop-daemon --stop --remove-pidfile --pidfile $DL_PIDFILE
+	log_end_msg $?
+
+	log_daemon_msg "Stopping ${BM_NAME} server" "${BM_NAME}"
+	start-stop-daemon --stop --remove-pidfile --pidfile $BM_PIDFILE
+	log_end_msg $?
+
+	log_daemon_msg "Stopping ${NAME} server" "${NAME}"
+	start-stop-daemon --stop --remove-pidfile --pidfile $PIDFILE
+	log_end_msg $?
+	;;
+
+   kill)
     	pkill -f 'socat.*INTERFACE:can'
     	pkill DS401_Master
     	pkill -f 'java.*jco-dl'
 	;;
+
+    restart|force-reload)
+	$0 stop && sleep 2 && $0 start
+	;;
+
     status)
     	socatID=`pgrep -d', ' -f 'socat.*INTERFACE:can'`
     	busMasterID=`pgrep -f 'DS401_Master'`

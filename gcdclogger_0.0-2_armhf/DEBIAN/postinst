@@ -1,4 +1,11 @@
 #!/bin/sh
+#echo "start of postinst script"
+# update needed changes in apache2
+a2query -m cgi -q
+ISTAT=$?
+#echo "ISTAT ${ISTAT}"
+set -e
+
 
 sudo chmod +x /etc/init.d/can-daemon
 sudo update-rc.d -f can-daemon defaults
@@ -7,6 +14,13 @@ sudo service can-daemon start
 sudo chown root /etc/init.d/can-daemon 
 sudo chgrp root /etc/init.d/can-daemon 
 
-sudo a2enmod cgi
-sudo service apache2 reload
+if [ ${ISTAT} -ne 0 ]
+then
+        sudo a2enmod cgi >/dev/null 2>&1
+fi
+
+sudo service apache2 restart
+
+#echo "end of postinst script"
+exit 0
 

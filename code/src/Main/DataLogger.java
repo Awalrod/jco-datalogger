@@ -1065,12 +1065,12 @@ public class DataLogger
 					while (st.hasMoreTokens())
 					{
 						String t2 = st.nextToken();
-						System.out.println("t2: "+t2);
+						System.out.println("Stream t2: "+t2);
 						InetAddress i1 = getIPv4FromIFaceName(t2);
 						if(i1 ==null)
 							continue;
 
-						System.out.println("Using "+i1.getHostAddress());
+						System.out.println("Stream Using "+i1.getHostAddress());
 						try
 						{
 							StreamServer streamServer = new StreamServer(i1,Integer.decode(streamPort));
@@ -1091,12 +1091,31 @@ public class DataLogger
 			else if(qName.equalsIgnoreCase("controller")){
 				bController = false;
 				try{
-					controller.setBusMasterPort(Integer.decode(busMasterPort));
-					controllerServer = new ControllerServer(controllerAddress,Integer.decode(controllerPort),controller);
-					controllerServer.start();
-					controller.setSampleRate(50); //default. possible make this configurable in the future
+					StringTokenizer st = new StringTokenizer(controllerAddress, ",");
+					while (st.hasMoreTokens())
+                                        {
+						String t2 = st.nextToken();
+                                                System.out.println("Controller t2: "+t2);
+                                                InetAddress i1 = getIPv4FromIFaceName(t2);
+                                                if(i1 ==null)
+                                                        continue;
+						System.out.println("Controller Using "+i1.getHostAddress());
+						try
+						{
+							controller.setBusMasterPort(Integer.decode(busMasterPort));
+							controllerServer = new ControllerServer(i1,Integer.decode(controllerPort),controller);
+							controllerServer.start();
+							controller.setSampleRate(50); //default. possible make this configurable in the future
+						}
+						catch(IllegalStateException e3)
+						{
+							System.out.println("Error starting Controller server");
+							e3.printStackTrace();
+						}
+					}
 				}catch(Exception e){
-					System.out.println("Error starting Conroller server");
+					System.out.println("Error");
+					e.printStackTrace();
 				}
 			}
 			else if(bDriver)

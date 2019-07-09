@@ -9,6 +9,7 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ControllerServer extends WebSocketServer{
@@ -17,7 +18,10 @@ public class ControllerServer extends WebSocketServer{
         super(new InetSocketAddress(host,port));
         controller = cont;
     }
-    
+    public ControllerServer(InetAddress addr, int port,Controller cont)throws UnknownHostException{
+        super(new InetSocketAddress(addr,port));
+        controller = cont;
+    }
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake){
         if(controller.getRecordingStatus()){

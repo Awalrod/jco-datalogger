@@ -58,7 +58,7 @@
 		</node>			
 	</channels>
 	<controller>
-		<address>canbus</address>
+		<address>eth0,wlan0,lo</address>
 		<port>7331</port>
 		<busmasterport>7332</busmasterport>
 	</controller>

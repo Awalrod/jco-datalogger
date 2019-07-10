@@ -1,5 +1,5 @@
 #!/bin/sh
-#echo "start of postinst script"
+echo "start of postinst script"
 # update needed changes in apache2
 a2query -m cgi -q
 ISTAT=$?
@@ -21,6 +21,13 @@ fi
 
 sudo service apache2 restart
 
-#echo "end of postinst script"
+systemctl daemon-reload
+systemctl enable can-socat-setup.service
+systemctl start can-socat-setup
+systemctl enable busmaster.service
+systemctl start busmaster
+systemctl enable datalogger.service
+systemctl start datalogger
+echo "end of postinst script"
 exit 0
 

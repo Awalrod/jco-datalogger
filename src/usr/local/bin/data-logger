@@ -5,29 +5,29 @@ if [ "$JAVA_HOME" = "" ]; then
 	JAVA_HOME=/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/jre
 fi
 
-while getopts ":p:" opt; do
-        case ${opt} in
-        p )
-                PIDFILE=$OPTARG
-#                echo $$ > ${PIDFILE}
-        ;;
-        \? )
-                echo "Invalid option: $OPTARG" 1>&2
-        ;;
-        : )
-                echo "Invalid option: $OPTARG requires an argument" 1>&2
-        ;;
-        esac
-done
-shift $((OPTIND -1))
+#while getopts ":p:" opt; do
+#        case ${opt} in
+#        p )
+#                PIDFILE=$OPTARG
+##                echo $$ > ${PIDFILE}
+#        ;;
+#        \? )
+#                echo "Invalid option: $OPTARG" 1>&2
+#        ;;
+#        : )
+#                echo "Invalid option: $OPTARG requires an argument" 1>&2
+#        ;;
+#        esac
+#done
+#shift $((OPTIND -1))
 
 #Makes sure to use the correct jre
-$JAVA_HOME/bin/java -jar /usr/local/share/java/jco-dl-1v1.jar --xml-config "/etc/gcdc/loggerconfig.xml" --address 'localhost' -dir /var/www/html/data &
-SPID=$!
-echo ${SPID}
-if [ -n "$PIDFILE" ];
-then
-       echo ${SPID} > ${PIDFILE}
-fi
+$JAVA_HOME/bin/java -jar /usr/local/share/java/jco-dl-1v1.jar --xml-config "/etc/gcdc/loggerconfig.xml" --address 'localhost' -dir /var/www/html/data
+#SPID=$!
+#echo ${SPID}
+#if [ -n "$PIDFILE" ];
+#then
+#       echo ${SPID} > ${PIDFILE}
+#fi
 
 

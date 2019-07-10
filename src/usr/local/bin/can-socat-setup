@@ -10,28 +10,28 @@ else
 fi
 
 
-while getopts ":p:" opt; do
-	case ${opt} in
-	p )
-		PIDFILE=$OPTARG
-#		echo $$ > ${PIDFILE}
-	;;
-	\? )
-		echo "Invalid option: $OPTARG" 1>&2
-	;;
-	: )
-		echo "Invalid option: $OPTARG requires an argument" 1>&2
-	;;
-	esac
-done
-shift $((OPTIND -1))
+#while getopts ":p:" opt; do
+#	case ${opt} in
+#	p )
+#		PIDFILE=$OPTARG
+##		echo $$ > ${PIDFILE}
+#	;;
+#	\? )
+#		echo "Invalid option: $OPTARG" 1>&2
+#	;;
+#	: )
+#		echo "Invalid option: $OPTARG requires an argument" 1>&2
+#	;;
+#	esac
+#done
+#shift $((OPTIND -1))
 
 #sudo socat -d -d INTERFACE:can0,pf=29,type=3,prototype=1 TCP-LISTEN:2000,fork,reuseaddr
 #sudo socat INTERFACE:can0,pf=29,type=3,prototype=1 TCP-LISTEN:2000,fork,reuseaddr
-socat INTERFACE:can0,pf=29,type=3,prototype=1 UDP-LISTEN:2000,fork,reuseaddr,sndbuf=32 &
-SPID=$!
-#echo ${SPID}
-if [ -n "$PIDFILE" ];
-then
-	echo ${SPID} > ${PIDFILE}
-fi
+socat INTERFACE:can0,pf=29,type=3,prototype=1 UDP-LISTEN:2000,fork,reuseaddr,sndbuf=32 
+#SPID=$!
+##echo ${SPID}
+#if [ -n "$PIDFILE" ];
+#then
+#	echo ${SPID} > ${PIDFILE}
+#fi

@@ -53,7 +53,7 @@ install: $(steps) package
 	#REQUIRES SUDO
 	#run this first if changes were made that need to be implemented
 	#moves working code to install locations
-	dpkg -i $(PACK).deb
+	sudo dpkg -i $(PACK).deb
 
 clean:
 	rm -rf $(TMP_DIR)

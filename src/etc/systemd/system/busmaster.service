@@ -1,0 +1,13 @@
+[Unit]
+Description=A CANOPEN Bus master
+After=can-socat-setup.target
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/local/bin/busmaster
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=datalogger.target

@@ -29,24 +29,24 @@ init:
 #	cp $(SRC)/$(INIT_LOC)/can-daemon $(PACK)/$(INIT_LOC)/can-daemon
 	
 canfest:
-	mkdir -p $(TMP_DIR)/$(CANFEST_LOC)
-	cp $(SRC)/$(CANFEST_LOC)/libcanfestival* $(TMP_DIR)/$(CANFEST_LOC)/
+#	mkdir -p $(TMP_DIR)/$(CANFEST_LOC)
+#	cp $(SRC)/$(CANFEST_LOC)/libcanfestival* $(TMP_DIR)/$(CANFEST_LOC)/
 
 bin:
-	mkdir -p $(TMP_DIR)/$(BIN_LOC)
-	cp $(SRC)/$(BIN_LOC)/DS401_Master $(TMP_DIR)/$(BIN_LOC)/DS401_Master
-	cp $(SRC)/$(BIN_LOC)/busmaster $(TMP_DIR)/$(BIN_LOC)/busmaster
-	cp $(SRC)/$(BIN_LOC)/can-boot $(TMP_DIR)/$(BIN_LOC)/can-boot
-	cp $(SRC)/$(BIN_LOC)/can-socat-setup $(TMP_DIR)/$(BIN_LOC)/can-socat-setup
-	cp $(SRC)/$(BIN_LOC)/data-logger $(TMP_DIR)/$(BIN_LOC)/data-logger
+#	mkdir -p $(TMP_DIR)/$(BIN_LOC)
+#	cp $(SRC)/$(BIN_LOC)/DS401_Master $(TMP_DIR)/$(BIN_LOC)/DS401_Master
+#	cp $(SRC)/$(BIN_LOC)/busmaster $(TMP_DIR)/$(BIN_LOC)/busmaster
+#	cp $(SRC)/$(BIN_LOC)/can-boot $(TMP_DIR)/$(BIN_LOC)/can-boot
+#	cp $(SRC)/$(BIN_LOC)/can-socat-setup $(TMP_DIR)/$(BIN_LOC)/can-socat-setup
+#	cp $(SRC)/$(BIN_LOC)/data-logger $(TMP_DIR)/$(BIN_LOC)/data-logger
 
 jar: 
 	mkdir -p $(TMP_DIR)/$(JAR_LOC)
 	cp $(SRC)/$(JAR_LOC)/jco-dl-1v1.jar $(TMP_DIR)/$(JAR_LOC)/jco-dl-1v1.jar
 	
 icon:
-	mkdir -p $(TMP_DIR)/$(ICON_LOC)
-	cp $(SRC)/$(ICON_LOC)/GCDC.png $(TMP_DIR)/$(ICON_LOC)/GCDC.png
+#	mkdir -p $(TMP_DIR)/$(ICON_LOC)
+#	cp $(SRC)/$(ICON_LOC)/GCDC.png $(TMP_DIR)/$(ICON_LOC)/GCDC.png
 	
 
 install: $(steps) package

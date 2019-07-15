@@ -11,4 +11,4 @@ Restart=always
 RestartSec=5
 
 [Install]
-WantedBy=datalogger.target
+RequiredBy=datalogger.service

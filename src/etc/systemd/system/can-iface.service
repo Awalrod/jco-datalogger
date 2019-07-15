@@ -1,6 +1,8 @@
 [Unit]
-Description=Bring up the CAN bus interface
+Description=Bringing up the CAN bus interface
 After=network.target
+Before=busmaster.service
+Before=can-socat-setup.service
 
 [Service]
 User=root

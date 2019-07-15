@@ -1,6 +1,6 @@
 [Unit]
 Description=JCO-Datalogger
-After=busmaster.target
+After=busmaster.service
 
 [Service]
 User=root

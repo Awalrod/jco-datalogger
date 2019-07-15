@@ -1,6 +1,7 @@
 [Unit]
-Description=A CAN bus interface to UDP socket layer
+Description=CAN bus interface to UDP socket layer
 After=network.target
+Before=datalogger.service
 
 [Service]
 User=root

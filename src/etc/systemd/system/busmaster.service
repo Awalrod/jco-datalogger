@@ -1,6 +1,7 @@
 [Unit]
-Description=A CANOPEN Bus master
+Description=CANOPEN Bus master
 After=can-socat-setup.target
+Before=datalogger.service
 
 [Service]
 User=root

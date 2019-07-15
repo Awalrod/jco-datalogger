@@ -1,0 +1,10 @@
+#!/bin/sh
+#java -jar /usr/local/share/java/jco-dl-1v1.jar --address '10.10.3.1' $*	#When pi is a hotspot
+#java -jar /usr/local/share/java/jco-dl-1v1.jar --address '192.168.1.54' $*	#When pi is connected to ethernet
+if [ "$JAVA_HOME" = "" ]; then
+	JAVA_HOME=/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/jre
+fi
+
+$JAVA_HOME/bin/java -jar /usr/local/share/java/jco-dl-1v1.jar --xml-config "/etc/gcdc/loggerconfig.xml" --address 'localhost' -dir /var/www/html/data $*
+#Makes sure to use the correct jre
+

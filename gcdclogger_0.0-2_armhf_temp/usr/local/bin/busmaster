@@ -1,0 +1,58 @@
+#!/bin/sh
+
+#while getopts ":p:" opt; do
+#        case ${opt} in
+#        p )
+#                PIDFILE=$OPTARG
+##                echo $$ > ${PIDFILE}
+#        ;;
+#        \? )
+#                echo "Invalid option: $OPTARG" 1>&2
+#        ;;
+#        : )
+#                echo "Invalid option: $OPTARG requires an argument" 1>&2
+#        ;;
+#        esac
+#done
+#shift $((OPTIND -1))
+
+
+# **************************************************************
+# *  DS401_Master                                              *
+# *                                                            *
+# *  A CanOpen master that controls a group of slaves:         *
+# *  - set state to operational                                *
+# *  - send periodic SYNC                                      *
+# *  - send periodic RPDO 1 to a slave (digital output)        *
+# *  - listen to a slave TPDO 1 (digital input)                *
+# *  - Mapping RPDO 1 bit per bit (digital input)              *
+# *                                                            *
+# *   Usage:                                                   *
+# *   ./DS401_Master  [OPTIONS]                                *
+# *                                                            *
+# *   OPTIONS:                                                 *
+# *     -l : Can library ["libcanfestival_can_virtual.so"]     *
+# *     -x : config file ["config.xml"]                        *
+# *     -d : increase debugging verbosity                      *
+# *                                                            *
+# *    Master:                                                 *
+# *     -m : bus name ["1"]                                    *
+# *     -M : 1M,500K,250K,125K,100K,50K,20K,10K                *
+# *     -i : Node id format [0x01 , 0x7F]                      *
+# *     -p : port number to listen to for cgi-bin requests     *
+# *                                                            *
+# **************************************************************
+/usr/local/bin/DS401_Master -i0x66 -x /etc/gcdc/busmaster-config.xml -d
+#SPID=$!
+##echo ${SPID}
+#if [ -n "$PIDFILE" ];
+#then
+#       echo ${SPID} > ${PIDFILE}
+#fi
+
+#DS401_Master -i0x33 -x config.xml -d  -d 
+#DS401_Master -i0x41 -x config.xml -d -d
+#DS401_Master -llibcanfestival_can_socket.so -m can0 -M500K -i0x66
+#DS401_Master -llibcanfestival_can_socket.so -m can0 -M500K -i0x40
+#DS401_Master -llibcanfestival_can_socket.so -m can0 -M500K -i0x20
+

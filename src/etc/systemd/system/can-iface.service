@@ -8,5 +8,5 @@ Group=root
 ExecStart=/usr/local/bin/can-iface
 
 [Install]
-WantedBy=busmaster.target
-WantedBy=can-socat-setup.target
+RequiredBy=busmaster.service
+RequiredBy=can-socat-setup.service

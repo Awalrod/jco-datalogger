@@ -1,0 +1,4 @@
+# Configuration for networking init script being run during
+# the CAN bus interface
+
+BITRATE=500000

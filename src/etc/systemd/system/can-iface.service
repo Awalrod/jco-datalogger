@@ -1,13 +1,19 @@
 [Unit]
-Description=Bringing up the CAN bus interface
+Description=Raise CAN bus interface
 After=network.target
 Before=busmaster.service
 Before=can-socat-setup.service
+Conflicts=shutdown.target
 
 [Service]
 User=root
 Group=root
-ExecStart=/usr/local/bin/can-iface
+Type=oneshot
+EnvironmentFile=-/etc/gcdc/can-iface
+ExecStart=/sbin/ip link set can0 up type can bitrate $BITRATE
+ExecStop=/sbin/ip link set can0 down
+RemainAfterExit=true
+TimeoutStartSec=10s
 
 [Install]
 RequiredBy=busmaster.service

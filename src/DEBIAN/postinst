@@ -15,18 +15,27 @@ sudo service apache2 restart
 
 systemctl daemon-reload
 echo "reload"
+
+systemctl enable can-iface.service
+echo "enable caniface"
+systemctl start can-iface.service
+echo "start can"
+
 systemctl enable can-socat-setup.service
 echo "enable socat"
 systemctl start can-socat-setup
 echo "start socat"
+
 systemctl enable busmaster.service
 echo "enable busmaster"
 systemctl start busmaster
 echo "start busmaster"
+
 systemctl enable datalogger.service
 echo "enable datalogger"
 systemctl start datalogger
 echo "start datalogger"
+
 echo "end of postinst script"
 exit 0
 

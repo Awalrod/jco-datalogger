@@ -1,6 +1,6 @@
 [Unit]
 Description=CAN bus interface to UDP socket layer
-After=network.target
+After=can-iface.service
 Before=datalogger.service
 
 [Service]

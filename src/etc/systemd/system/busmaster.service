@@ -1,6 +1,6 @@
 [Unit]
 Description=CANOPEN Bus master
-After=can-socat-setup.target
+After=can-iface.service
 Before=datalogger.service
 
 [Service]

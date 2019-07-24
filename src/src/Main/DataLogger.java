@@ -195,7 +195,7 @@ public class DataLogger
 			}
 			catch(Exception e)
 			{
-				System.out.println(e);
+				System.out.println("remove synclistener " +e);
 			}
 			GlobalVars.START_TIME = null;
 			recordingStatus = false;
@@ -401,7 +401,7 @@ public class DataLogger
 					}		
 				}		
 			}catch(Exception e){
-				debugPrint("error retrieving filelist");
+				System.out.println("error retrieving filelist");
 				e.printStackTrace();
 			}
 			return files.toArray(new Path[files.size()]);
@@ -417,7 +417,7 @@ public class DataLogger
 					dataFiles.add(file.toString());
 				}		
 			}catch(Exception e){
-				debugPrint("error retrieving filelist");
+				System.out.println("error retrieving filelist");
 				e.printStackTrace();
 			}		
 			return dataFiles.toArray(new String [0]);					
@@ -441,7 +441,7 @@ public class DataLogger
 					}
 				}
 			}catch(IOException ioe){
-				debugPrint("Error creating detailed File List");
+				System.out.println("Error creating detailed File List");
 				ioe.printStackTrace();
 			}
 			/*try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
@@ -458,7 +458,7 @@ public class DataLogger
 					}		
 				}		
 			}catch(Exception e){
-				debugPrint("error retrieving filelist");
+				System.out.println("error retrieving filelist");
 				e.printStackTrace();
 			}*/		
 			String d[][] =  dataFiles.toArray(new String[0][0]);
@@ -529,7 +529,7 @@ public class DataLogger
 			try{
 				uri = new URI("jar:file://"+archivePath+"/"+filename);
 			}catch(URISyntaxException urise){
-				debugPrint("uri messed up");
+				System.out.println("uri messed up");
 				urise.printStackTrace();
 			}
 			try(FileSystem zipfs = FileSystems.newFileSystem(uri,env)){
@@ -539,9 +539,10 @@ public class DataLogger
 					Files.copy(file,PathInZip,StandardCopyOption.REPLACE_EXISTING);
 				}
 			}catch(IOException ioe){
-				debugPrint("Couldn't create zip file");
+				System.out.println("Couldn't create zip file");
 				ioe.printStackTrace();
 			}catch(Exception e){
+				System.out.println("unknown "+ e);
 				e.printStackTrace();
 			}
 			return filename;
@@ -566,7 +567,7 @@ public class DataLogger
 				}
 				catch(Exception e)
 				{
-					debugPrint("createFile() couldn't create file");
+					System.out.println("createFile() couldn't create file");
 				}
 				currentSampleSize = 0;
 				currentFileNumber++;
@@ -668,6 +669,7 @@ public class DataLogger
 					connection.close();
 			}catch(IOException ioe)
 			{
+				System.out.println("close connection");
 				ioe.printStackTrace();
 			}
 		}
@@ -876,7 +878,7 @@ public class DataLogger
 			}
 			catch(IOException ioe)
 			{
-				debugPrint("SocketListener.run(): IO Error");
+				System.out.println("SocketListener.run(): IO Error");
 				ioe.printStackTrace();
 			}
 		}
@@ -1065,7 +1067,7 @@ public class DataLogger
 					while (st.hasMoreTokens())
 					{
 						String t2 = st.nextToken();
-						System.out.println("Stream t2: "+t2);
+//						System.out.println("Stream t2: "+t2);
 						InetAddress i1 = getIPv4FromIFaceName(t2);
 						if(i1 ==null)
 							continue;
@@ -1415,6 +1417,7 @@ public class DataLogger
 			}
 			catch(InterruptedException ie)
 			{
+				System.out.println("coThread.join exception");
 				ie.printStackTrace();
 			}
 		}
@@ -1455,6 +1458,7 @@ public class DataLogger
 
 			controllerServer.stop();
 		}catch(Exception e){
+			System.out.println("Error during shutdown");
 			e.printStackTrace();
 		}
 	}

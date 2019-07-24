@@ -125,6 +125,7 @@ public class StreamServer extends WebSocketServer {
 	
 	@Override
 	public void onError( WebSocket conn, Exception ex ) {
+		System.out.println("StreamServer onError message received " + ex);
 		ex.printStackTrace();
 		if( conn != null ) {
 			// some errors like port binding failed may not be assignable to a specific websocket
@@ -133,7 +134,7 @@ public class StreamServer extends WebSocketServer {
 
 	@Override
 	public void onStart() {
-		System.out.println("Server started!");
+		System.out.println("StreamServer started!");
 	}
 	
 	public void stream(AccelerometerReading readings[])

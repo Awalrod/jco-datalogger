@@ -1443,7 +1443,7 @@ public class DataLogger
 	//Shuts down everything
 	public void gracefulShutdown()
 	{
-		debugPrint("gracefulShutdown");
+		System.out.println("gracefulShutdown");
 		coListener.stopSyncListener();
 		coThread.interrupt();
 		//socketListener.closeConnection();

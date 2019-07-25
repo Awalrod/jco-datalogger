@@ -130,6 +130,7 @@ public class StreamServer extends WebSocketServer {
 		if( conn != null ) {
 			// some errors like port binding failed may not be assignable to a specific websocket
 		}
+		System.exit(4);
 	}
 
 	@Override
@@ -183,6 +184,10 @@ public class StreamServer extends WebSocketServer {
 			}
 		}
 		return null;
+	}
+	
+	public void shutdown() throws IOException, InterruptedException{
+		super.stop();
 	}
 	
 	

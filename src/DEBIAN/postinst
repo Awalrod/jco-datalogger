@@ -6,6 +6,7 @@ ISTAT=$?
 #echo "ISTAT ${ISTAT}"
 set -e
 
+ldconfig
 if [ ${ISTAT} -ne 0 ]
 then
         sudo a2enmod cgi >/dev/null 2>&1

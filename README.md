@@ -28,12 +28,10 @@ multiple channels of data and record files. It is a good place to start if
 you are interested in creating your own web interface.  
 
 The JSON object sent is in the form:  
-`[{"x":0,"y":0,"z":0},{"x":-29362,"y":64095,"z":245445},{"x":-155975,"y":-84501,"z":185922},{"x":78515,"y":124510,"z":206242},{"x":0,"y":0,"z":0},{"x":0,"y":0,"z":0},{"x":0,"y":0,"z":0}]`  
+`{"ts":1.564685852077E9,"accel1":[{"x":-12031,"y":-3493,"z":253576,"id":"2"},{"x":131,"y":-34,"z":25576,"id":"3"},{"x":-16031,"y":-3093,"z":276,"id":"4"}]}`  
 The first dataset being the lowest nodeId and the last being the highest. To
 configure how many nodes are on the network, edit 
-[loggerconfig.xml](jco-datalogger/code/loggerconfig.xml). Extra nodes that
-aren't physically connected will show up as `{"x":0,"y":0,"z":0}` in the
-data stream.
+[loggerconfig.xml](jco-datalogger/code/loggerconfig.xml).
 
 ## Startup Options
 Options:

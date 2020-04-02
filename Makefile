@@ -42,7 +42,7 @@ bin:
 
 jar: 
 	mkdir -p $(TMP_DIR)/$(JAR_LOC)
-	cp $(SRC)/$(JAR_LOC)/jco-dl-1v1.jar $(TMP_DIR)/$(JAR_LOC)/jco-dl-1v1.jar
+	cp $(SRC)/build/jco-dl-1v1.jar $(TMP_DIR)/$(JAR_LOC)/jco-dl-1v1.jar
 	
 icon:
 #	mkdir -p $(TMP_DIR)/$(ICON_LOC)

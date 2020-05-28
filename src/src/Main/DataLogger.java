@@ -91,15 +91,13 @@ public class DataLogger
 {
 	private CanOpen canOpen;
 	public COListener coListener;
-	private Thread coThread;
+	private CanOpenThread coThread;
 
 	private ArrayList<NodeTracker> nodes;
 
 	private DataFormatter dfmt;
 	public FileHandler fileHandler;
 	private Timer shutdownTimer;
-	private SocketListener socketListener;
-	private Thread socketThread;
 	private String[] args;
 	public boolean recordingStatus;
 	private ReadableInstant startInstant;
@@ -1233,7 +1231,7 @@ public class DataLogger
 
 
 	//Does most of the CanOpen setup stuff
-	private class CanOpenThread implements Runnable
+	private class CanOpenThread extends Thread
 	{
 		private DriverManager dm;
 		private Driver drvr;
@@ -1293,17 +1291,16 @@ public class DataLogger
 						coListener.startSyncListener();
 					}
 					cl.startSyncListener();
-					canOpen.join();
+					canOpen.join(1000);
 					debugPrint("CanOpenThread.run(): canOpen.start() is finished");
 				}
 				while(restart);
 			}
 			catch(InterruptedException ie)
 			{
+System.out.println("CanOpenThread shutdown REALLY");
 				dm.unloadDriver();
-				coThread.interrupt();
-				coThread = null;
-				dm.unloadDriver();
+//				dm.unloadDriver();
 				drvr = null;
 				dm = null;
 				System.gc();
@@ -1313,11 +1310,26 @@ public class DataLogger
 				nodes.clear();
 				fileHandler = null;
 				System.gc();
+System.out.println("CanOpenThread shutdown complete");
 			}
 			catch(Exception coe)
 			{
 				coe.printStackTrace();
 			}
+		}
+		public void shutdown()
+		{
+			System.out.println("CanOpenThread shutdown REALLY");
+			dm.unloadDriver();
+			drvr = null;
+			dm = null;
+			System.gc();
+			canOpen = null;
+			od = null;
+			GlobalVars.START_TIME = null;
+			nodes.clear();
+			fileHandler = null;
+			System.gc();
 		}
 	} // end private class def
 
@@ -1375,9 +1387,6 @@ public class DataLogger
 		}
 
 		{
-			/*socketListener = new SocketListener();
-			socketThread = new Thread(socketListener);
-			socketThread.start();*/
 
 			shutdownTimer = new Timer("Shutdown Timer", true);//true means it is a daemon
 
@@ -1396,7 +1405,7 @@ public class DataLogger
 			try
 			{
 				if( xmlFileName != null)
-					coThread = new Thread(new CanOpenThread(xmlFileName));
+					coThread = new CanOpenThread(xmlFileName);
 				else
 				{
 					System.out.println("data logger requires a config file.");
@@ -1413,7 +1422,7 @@ public class DataLogger
 			
 			try
 			{
-				coThread.join();
+				coThread.join(1000);
 			}
 			catch(InterruptedException ie)
 			{
@@ -1444,15 +1453,12 @@ public class DataLogger
 	public void gracefulShutdown()
 	{
 		System.out.println("gracefulShutdown");
-		coListener.stopSyncListener();
-		coThread.interrupt();
-		//socketListener.closeConnection();
-		//socketThread.interrupt();
 		try{
 			Iterator<StreamServer> ss = streamServers.iterator();
 			while(ss.hasNext())
 			{
-				ss.next().stop();
+				ss.next().shutdown();
+//				ss.next().stop();
 				streamServers.remove(ss);
 			}
 
@@ -1461,6 +1467,43 @@ public class DataLogger
 			System.out.println("Error during shutdown");
 			e.printStackTrace();
 		}
+		System.out.println("stream servers stopped");
+
+		coListener.stopSyncListener();
+//		System.out.println("coListener stopped");
+//		coThread.shutdown();
+//		System.out.println("coThread.shutdown");
+
+//{
+//Set<Thread> threads = Thread.getAllStackTraces().keySet();
+//for (Thread t : threads) {
+//    String name = t.getName();
+//    Thread.State state = t.getState();
+//    int priority = t.getPriority();
+//    String type = t.isDaemon() ? "Daemon" : "Normal";
+//    System.out.printf("%-20s \t %s \t %d \t %s\n", name, state, priority, type);
+//    if(! t.isDaemon())
+//    	t.interrupt();
+//}
+//}
+//try{
+//Thread.sleep(500);
+//} catch(InterruptedException e)
+//{
+//}
+//{Set<Thread> threads = Thread.getAllStackTraces().keySet();
+// 
+//for (Thread t : threads) {
+//    String name = t.getName();
+//    Thread.State state = t.getState();
+//    int priority = t.getPriority();
+//    String type = t.isDaemon() ? "Daemon" : "Normal";
+//    System.out.printf("yy %-20s \t %s \t %d \t %s\n", name, state, priority, type);
+//}
+//}
+//	throw new NullPointerException("a bad end");
+//		System.exit(0);
+
 	}
 
 

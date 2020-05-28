@@ -219,7 +219,8 @@
 					value="${lib.dir}/args4f-2.33.jar
 					${lib.dir}/joda-time-2.9.9.jar
 					${lib.dir}/gson-2.8.5-SNAPSHOT.jar
-					${lib.dir}/Java-WebSocket-1.3.9-dev.jar
+					${lib.dir}/Java-WebSocket-1.5.1.jar
+					${lib.dir}/slf4j-simple-1.7.9.jar
 					${lib.dir}/helpscreen.txt"/>
 				<attribute name="Canopen-Revision"
 					value="${svn.revision}"/>

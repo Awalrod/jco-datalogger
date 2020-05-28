@@ -1,7 +1,7 @@
 [Unit]
 Description=CAN bus interface to UDP socket layer
 After=can-iface.service
-Before=datalogger.service
+Before=jcodatalogger.service
 
 [Service]
 User=root
@@ -11,4 +11,4 @@ Restart=always
 RestartSec=5
 
 [Install]
-RequiredBy=datalogger.service
+RequiredBy=jcodatalogger.service

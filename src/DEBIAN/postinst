@@ -18,24 +18,24 @@ systemctl daemon-reload
 echo "reload"
 
 systemctl enable can-iface.service
-echo "enable caniface"
+echo "enabled caniface"
 systemctl start can-iface.service
-echo "start can"
+echo "started can"
 
 systemctl enable can-socat-setup.service
-echo "enable socat"
+echo "enabled socat"
 systemctl start can-socat-setup
-echo "start socat"
+echo "started socat"
 
 systemctl enable busmaster.service
-echo "enable busmaster"
+echo "enabled busmaster"
 systemctl start busmaster
-echo "start busmaster"
+echo "started busmaster"
 
-systemctl enable datalogger.service
-echo "enable datalogger"
-systemctl start datalogger
-echo "start datalogger"
+systemctl enable jcodatalogger.service
+echo "enabled jcodatalogger"
+systemctl start jcodatalogger
+echo "started jcodatalogger"
 
 echo "end of postinst script"
 exit 0

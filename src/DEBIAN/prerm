@@ -1,12 +1,27 @@
 #!/bin/sh
 echo "start of prerm script"
-set -e
 
 
 systemctl stop jcodatalogger.service
 echo "stopped jcodatalogger"
 systemctl disable jcodatalogger.service
 echo "disabled jcodatalogger"
+
+systemctl stop busmaster.service
+echo "stopped busmaster"
+systemctl disable busmaster.service
+echo "disabled busmaster"
+
+systemctl stop can-socat.service
+echo "stopped can-socat"
+systemctl disable can-socat.service
+echo "disabled can-socat"
+
+systemctl stop can-iface.service
+echo "stopped can-iface"
+systemctl disable can-iface.service
+echo "disabled can-iface"
+
 
 systemctl daemon-reload
 echo "reload"

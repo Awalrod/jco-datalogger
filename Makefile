@@ -19,7 +19,7 @@ package: $(steps)
 
 config:
 	@rm -rf $(TMP_DIR)
-	-@mkdir -p $(TMP_DIR) 2>&1 1>$(NUL)
+	-@mkdir -p $(TMP_DIR) 2>&1
 	
 init:
 	rsync -a $(SRC)/* $(TMP_DIR) --exclude=.svn --exclude=*~ --exclude=./src --exclude=build*
@@ -32,10 +32,10 @@ install: $(steps) package
 	#REQUIRES SUDO
 	#run this first if changes were made that need to be implemented
 	#moves working code to install locations
-	sudo dpkg -i $(TARGET).deb
+	sudo dpkg -i $(PACK)_$(VERSION)_armhf.deb
 	
 uninstall:
-	sudo dpkg -r(PACK)
+	sudo dpkg -r $(PACK)
 
 clean:
 	rm -rf $(TMP_DIR)

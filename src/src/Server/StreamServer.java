@@ -60,7 +60,12 @@ public class StreamServer extends WebSocketServer {
 
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
+	try{
 		System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()  + " has left" );
+	} catch(NullPointerException e)
+	{
+		System.out.println("onClose   " +e);
+	}
 		Streamer toRemove;
 		toRemove = getStreamByConn(conn);
 		if(toRemove !=null){
@@ -187,7 +192,7 @@ public class StreamServer extends WebSocketServer {
 	}
 	
 	public void shutdown() throws IOException, InterruptedException{
-		super.stop();
+		super.stop(2000);
 	}
 	
 	

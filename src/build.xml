@@ -198,11 +198,11 @@
                 	<format property="timestamp" pattern="yyyy-MM-dd"/>
                 </tstamp>
                 
-                <exec executable="gitversion.sh"
+<!--                <exec executable="gitversion.sh"
                 failifexecutionfails="no" dir="${svn.dest}"
                 outputproperty="svn.revision">
 			<arg value="-n"/>
-		</exec>
+		</exec> -->
 		
 		<jar jarfile="${build.dir}/${jar.name}"
 		basedir="${build.dest}">

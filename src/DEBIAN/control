@@ -1,9 +1,9 @@
-Package: gcdclogger
-Version: 0.0-2
+Package: jcodatalogger
+Version: 1.0
 Maintainer: mike <mpcrowe@gmail.com>
 Section: text
-Architecture: armhf
+Architecture: all
 Priority: optional
 Homepage: http://www.gcdataconcepts.com/gcdc1317/gcdclogger.deb
-Depends: i2c-tools (>=3.1.1), apache2 (>=2.4.10), socat (>=1.7.2.4), libxml2-dev (>=2.9.1), can-utils (>=0.0), openjdk-9-jdk (>=9.0.0)
-Description: gcdcdatalogger package for use with GCDC1317. The GCDC1317 board uses the Rasberry Pi i2c and spi interfaces.  The i2c interface is used to communicate with the RTC and the power management controller on the board.  The spi interface is used to communicate with the CAN bus interface.   This package installs a number of scripts to configure these devices
+Depends: socat (>=1.7.2.4), openjdk-9-jdk (>=9.0.0)
+Description: jcodatalogger Java CAN-Open, JCO application that monitors bus activity and converts it to JSON messages which are placed onto a websocket

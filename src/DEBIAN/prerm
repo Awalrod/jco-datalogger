@@ -1,0 +1,15 @@
+#!/bin/sh
+echo "start of prerm script"
+set -e
+
+
+systemctl stop jcodatalogger.service
+echo "stopped jcodatalogger"
+systemctl disable jcodatalogger.service
+echo "disabled jcodatalogger"
+
+systemctl daemon-reload
+echo "reload"
+
+echo "end of prerm script"
+exit 0

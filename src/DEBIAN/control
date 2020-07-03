@@ -1,8 +1,8 @@
 Package: jcodatalogger
-Version: 1.0
+Version: 1.1
 Maintainer: mike <mpcrowe@gmail.com>
 Section: text
-Architecture: armhf
+Architecture: all
 Priority: optional
 Homepage: http://www.gcdataconcepts.com/gcdc1317/gcdclogger.deb
 Depends: socat (>=1.7.2.4), openjdk-9-jdk (>=9.0.0), apache2 (>=2.4.10), socat (>=1.7.2.4), libxml2-dev (>=2.9.1), can-utils (>=0.0)

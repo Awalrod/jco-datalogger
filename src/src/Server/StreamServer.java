@@ -33,22 +33,26 @@ public class StreamServer extends WebSocketServer {
 	//WebSocket currentConnection;
 //	ArrayList<WebSocket> streams = new ArrayList<WebSocket>();
 	ArrayList<Streamer> streams = new ArrayList<Streamer>();
-
-	public StreamServer( int port ) throws UnknownHostException {
-		super( new InetSocketAddress( port ) );
-		
-	}
+	int port;
+	InetSocketAddress isa;
 
 	public StreamServer( InetSocketAddress address ) {
 		super( address );
+		setReuseAddr(true);
+		isa = address;
+//		System.out.println("interface "+isa.getHostString()+":"+isa.getPort());
 	}
 	
+	public StreamServer( int port ) throws UnknownHostException {
+		this( new InetSocketAddress( port ) );
+	}
+
 	public StreamServer(InetAddress host, int port) throws UnknownHostException{
-                super( new InetSocketAddress(host,port));
+                this( new InetSocketAddress(host,port));
         }
 
 	public StreamServer(String host, int port) throws UnknownHostException{
-		super( new InetSocketAddress(host,port));
+		this( new InetSocketAddress(host,port));
 	}
 	
 
@@ -61,7 +65,7 @@ public class StreamServer extends WebSocketServer {
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
 	try{
-		System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()  + " has left" );
+		System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()  +":"+isa.getPort()+ " has left" );
 	} catch(NullPointerException e)
 	{
 		System.out.println("onClose   " +e);
@@ -71,6 +75,7 @@ public class StreamServer extends WebSocketServer {
 		if(toRemove !=null){
 			synchronized(streams){streams.remove(toRemove);}
 		}
+		conn.close();
 	}
 
 	@Override //from WebSocketServer
@@ -130,9 +135,12 @@ public class StreamServer extends WebSocketServer {
 	
 	@Override
 	public void onError( WebSocket conn, Exception ex ) {
-		System.out.println("StreamServer onError message received " + ex);
+		
+		
+		System.out.println("StreamServer "+isa.getHostString()+":" + isa.getPort() + " onError message received\n" + ex);
 		ex.printStackTrace();
 		if( conn != null ) {
+			System.out.println(conn);
 			// some errors like port binding failed may not be assignable to a specific websocket
 		}
 		System.exit(4);
@@ -161,7 +169,9 @@ public class StreamServer extends WebSocketServer {
 //					streams.remove(s);
 				}
 			}
-		}	
+		}
+
+//		broadcast(readings);
 	}
 	
 /*	public void stream(String jsonText){
@@ -192,7 +202,14 @@ public class StreamServer extends WebSocketServer {
 	}
 	
 	public void shutdown() throws IOException, InterruptedException{
-		super.stop(2000);
+//		Iterator<WebSocket> i = this.getConnections().iterator();
+//		while(i.hasNext())
+//		{
+//			System.out.println("closing conneciton");
+//			i.next().closeConnection(1,"exit");
+//		}
+//WebSocketServerFactory wsf = getWebSocketFactory();
+		stop(10000);
 	}
 	
 	

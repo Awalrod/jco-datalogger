@@ -11,17 +11,28 @@ import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Iterator;
+import java.io.IOException;
 
 public class ControllerServer extends WebSocketServer{
     Controller controller;
+    InetSocketAddress isa;
+
+    public ControllerServer(InetSocketAddress isa, Controller cont)throws UnknownHostException{
+        super(isa);
+        setReuseAddr(true);
+        this.isa = isa;
+        controller = cont;
+    }
+    
     public ControllerServer(String host, int port,Controller cont)throws UnknownHostException{
-        super(new InetSocketAddress(host,port));
-        controller = cont;
+        this(new InetSocketAddress(host,port), cont);
     }
+    
     public ControllerServer(InetAddress addr, int port,Controller cont)throws UnknownHostException{
-        super(new InetSocketAddress(addr,port));
-        controller = cont;
+        this(new InetSocketAddress(addr,port), cont);
     }
+
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake){
         if(controller.getRecordingStatus()){
@@ -105,14 +116,51 @@ public class ControllerServer extends WebSocketServer{
     
     
     
-    @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote){}
+        @Override
+        public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
+        try{
+                System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress()  + " has left" );
+        }
+        catch(NullPointerException e)
+        {
+                System.out.println("onClose   " +e);
+        }
+//            Streamer toRemove = getStreamByConn(conn);
+//            if(toRemove !=null)
+//            {
+//                toRemove.close();
+////                synchronized(streams){streams.remove(toRemove);}
+//            }
+        }
+
     @Override
     public void onMessage(WebSocket conn, ByteBuffer message){}
+
     @Override 
-    public void onError(WebSocket conn, Exception ex){}
+    public void onError(WebSocket conn, Exception ex)
+    {
+        System.out.println("ControllerServer "+isa.getHostString()+":" + isa.getPort() + " onError message received\n" + ex);
+        ex.printStackTrace();
+        if( conn != null ) {
+            System.out.println(conn);
+            // some errors like port binding failed may not be assignable to a specific websocket
+        }
+        System.exit(4);
+    }
+    
     @Override
     public void onStart(){}
 
+    public void shutdown() throws IOException, InterruptedException
+    {
+//        Iterator<WebSocket> i = this.getConnections().iterator();
+//        while(i.hasNext())
+//        {
+//                System.out.println("controllerServer closing conneciton");
+//                i.next().closeConnection(1,"exit");
+//            i.next().close();
+//        }
+        stop(10000);
+    }
     
 }

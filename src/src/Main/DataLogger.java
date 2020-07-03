@@ -1430,9 +1430,6 @@ System.out.println("CanOpenThread shutdown complete");
 				ie.printStackTrace();
 			}
 		}
-		
-		
-		
 	}
 
 
@@ -1458,52 +1455,16 @@ System.out.println("CanOpenThread shutdown complete");
 			while(ss.hasNext())
 			{
 				ss.next().shutdown();
-//				ss.next().stop();
-				streamServers.remove(ss);
 			}
 
-			controllerServer.stop();
+			controllerServer.shutdown();
 		}catch(Exception e){
 			System.out.println("Error during shutdown");
 			e.printStackTrace();
 		}
 		System.out.println("stream servers stopped");
-
+		
 		coListener.stopSyncListener();
-//		System.out.println("coListener stopped");
-//		coThread.shutdown();
-//		System.out.println("coThread.shutdown");
-
-//{
-//Set<Thread> threads = Thread.getAllStackTraces().keySet();
-//for (Thread t : threads) {
-//    String name = t.getName();
-//    Thread.State state = t.getState();
-//    int priority = t.getPriority();
-//    String type = t.isDaemon() ? "Daemon" : "Normal";
-//    System.out.printf("%-20s \t %s \t %d \t %s\n", name, state, priority, type);
-//    if(! t.isDaemon())
-//    	t.interrupt();
-//}
-//}
-//try{
-//Thread.sleep(500);
-//} catch(InterruptedException e)
-//{
-//}
-//{Set<Thread> threads = Thread.getAllStackTraces().keySet();
-// 
-//for (Thread t : threads) {
-//    String name = t.getName();
-//    Thread.State state = t.getState();
-//    int priority = t.getPriority();
-//    String type = t.isDaemon() ? "Daemon" : "Normal";
-//    System.out.printf("yy %-20s \t %s \t %d \t %s\n", name, state, priority, type);
-//}
-//}
-//	throw new NullPointerException("a bad end");
-//		System.exit(0);
-
 	}
 
 
@@ -1521,10 +1482,8 @@ System.out.println("CanOpenThread shutdown complete");
 			@Override
 			public void run()
 			{
-				dl.gracefulShutdown();	
+				dl.gracefulShutdown();
 			}
 		});
-		//debugPrint("exit");
-		//System.exit(0);
 	}
 }

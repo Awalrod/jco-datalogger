@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.io.File;
 
 import com.google.gson.*;
+import java.time.Instant;
 /**
  * Created by gcdc on 6/7/17.
  */
@@ -189,12 +190,21 @@ public class DataFormatter
 //		jsonString = gson.toJson(reading);
 		return as.toJson();
 	}
+
+	public static String produceJsonString(AccelerometerReading[] readings, Instant instant)
+	{
+		AccelerometerSet as = new AccelerometerSet(readings, instant);
+		return as.toJson();
+
+	}
+
 	public static String produceJsonString(AccelerometerReading reading){
 		String jsonString;
 		Gson gson = new Gson();
 		jsonString = gson.toJson(reading);
 		return jsonString;
 	}
+
 	public static String produceJsonString(String[][] stringList){
 		String jsonString;
 		Gson gson = new Gson();

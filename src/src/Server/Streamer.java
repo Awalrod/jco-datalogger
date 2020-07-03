@@ -4,6 +4,7 @@ import DataRecording.AccelerometerReading;
 import DataFormatting.DataFormatter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
+import java.time.Instant;
 
 public class Streamer{
     boolean isStreaming = false;
@@ -48,6 +49,31 @@ public class Streamer{
     //            e.printStackTrace();
 //                isStreaming = false; //turn it off
     //        }   
+        } 
+    }
+
+    public void pushToStream(AccelerometerReading readings[], Instant instant) throws WebsocketNotConnectedException
+    {
+        String jsonText=null;
+        if(isStreaming)
+        {
+            if(streamAll)
+            {
+                jsonText = DataFormatter.produceJsonString(readings, instant);
+            }else
+            {
+                try
+                {
+                    jsonText = DataFormatter.produceJsonString(readings[nodeId]);
+                }catch(ArrayIndexOutOfBoundsException aioobe)
+                {
+                    aioobe.printStackTrace();
+                }
+            }
+            if(jsonText!=null)
+            {
+                    conn.send(jsonText);
+            }
         } 
     }
     

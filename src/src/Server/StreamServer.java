@@ -25,6 +25,8 @@ import com.gcdc.canopen.SubEntry;
 import DataRecording.AccelerometerReading;
 import DataFormatting.DataFormatter;
 
+import java.time.Instant;
+
 /**
  * A simple WebSocketServer implementation. Keeps track of a "chatroom".
  */
@@ -161,6 +163,29 @@ public class StreamServer extends WebSocketServer {
 				Streamer s = s1.next();
 				try{
 					s.stream(readings);
+				}
+				catch(WebsocketNotConnectedException e)
+				{
+					s.setStreaming(false);
+					System.out.println("removing stream because: "+e);
+//					streams.remove(s);
+				}
+			}
+		}
+
+//		broadcast(readings);
+	}
+
+	public void pushToStream(AccelerometerReading readings[], Instant instant)
+	{
+		synchronized(streams)
+		{
+			Iterator<Streamer> s1 = streams.iterator();
+			while(s1.hasNext())
+			{
+				Streamer s = s1.next();
+				try{
+					s.pushToStream(readings, instant);
 				}
 				catch(WebsocketNotConnectedException e)
 				{

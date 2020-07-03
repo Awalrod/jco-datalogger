@@ -81,7 +81,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-
+import java.time.*;
 
 
 /**
@@ -302,7 +302,7 @@ public class DataLogger
 	private class ConstantListener implements CanOpenListener
 	{
 	
-		public void onMessage(CanMessage canMeassage){
+		public void onMessage(CanMessage canMessage){
 			AccelerometerReading readings[] = new AccelerometerReading[nodes.size()];
 			int j=0;
 			for(int i=0; i<nodes.size(); i++ )
@@ -316,7 +316,7 @@ public class DataLogger
 			Iterator<StreamServer> ss = streamServers.iterator();
 			while(ss.hasNext())
 			{
-				ss.next().stream(readings);
+				ss.next().pushToStream(readings, canMessage.getInstant());
 			}
 		}
 		
@@ -1217,7 +1217,20 @@ System.out.println("CanOpenThread shutdown complete");
 	*/
 	public static void main(String args[])
 	{
-		
+		Instant i1 = Instant.now();
+		long secs = i1.getEpochSecond();
+		long nano = i1.getNano();
+		double dtime = secs+ (double)nano/1e9;
+		System.out.println("startTime: "+i1);
+		System.out.println("dtime    : "+dtime);
+
+		Instant i2 = Instant.now();
+		 secs = i2.getEpochSecond();
+		nano = i2.getNano();
+		System.out.println("startTime: "+i2);
+		dtime = secs+ (double)nano/1e9;
+		System.out.println("dtime    : "+dtime);
+
 		final DataLogger dl = new DataLogger(args);
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{

@@ -76,10 +76,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import java.io.File;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+//import org.xml.sax.helpers.DefaultHandler;
+import DataFormatting.NestedHandler;
+import DataFormatting.Simulator;
 
 import java.time.*;
 
@@ -625,7 +626,7 @@ public class DataLogger
 	}
 
 
-	private class CoXmlHandler extends DefaultHandler
+	private class CoXmlHandler extends NestedHandler
 	{
 		CanOpenThread cot;
 
@@ -677,12 +678,17 @@ public class DataLogger
 
 		CoXmlHandler(CanOpenThread cot)
 		{
+			super("/");
 			this.cot = cot;
 		}
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
 		{
+			if(qName.equalsIgnoreCase("simulator")) 
+			{
+				child = new Simulator("simulator");				
+			}
 			currConfigString = new String();
 		}
 

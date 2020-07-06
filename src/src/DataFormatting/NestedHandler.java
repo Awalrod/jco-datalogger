@@ -22,6 +22,7 @@ public class NestedHandler extends DefaultHandler
         this.parent = parent;
         this.nodeName = name;
         isActive = true;
+        nodeString = new String();
     }
     public NestedHandler(String name )
     {
@@ -73,7 +74,7 @@ public class NestedHandler extends DefaultHandler
     {
         if(child == null)
         {
-            nodeString = new String(ch, start, length).trim();
+            nodeString += new String(ch, start, length).trim();
             return;
         }
         child.characters( ch, start, length);

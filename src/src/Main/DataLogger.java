@@ -76,10 +76,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import java.io.File;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+//import org.xml.sax.helpers.DefaultHandler;
+import DataFormatting.NestedHandler;
+import DataFormatting.Simulator;
 
 import java.time.*;
 
@@ -625,43 +626,25 @@ public class DataLogger
 	}
 
 
-	private class CoXmlHandler extends DefaultHandler
+	private class CoXmlHandler extends NestedHandler
 	{
 		CanOpenThread cot;
-		boolean bDriver = false;
-		boolean bType = false;
-		boolean bAddress = false;
-		boolean bPort = false;
-		boolean bCanAddr = false;
-		boolean bChannels = false;
-		boolean bNode = false;
-		boolean bOdIndex = false;
+
 		String type;
 		String ipAddress;
 		String port;
 		String canAddr;
 		String odIndex;
-		boolean bCobid = false;
 		String cobid;
-		boolean bName = false;
 		String sName;
-		boolean bNumSamples = false;
 		String numSamples;
-		boolean bBitsSample = false;
 		String bitsSample;
 		private int rxPdoCtlMapIndex = 0x01;
-		boolean bStream = false;
-		boolean bStreamAddress = false;
-		boolean bStreamPort = false;
-		String streamAddress;
-		String streamPort;
-		boolean bController = false;
-		boolean bControllerAddress = false;
-		boolean bControllerPort = false;
 		String controllerAddress;
 		String controllerPort;
-		boolean bBusMasterPort;
 		String busMasterPort;
+		String currConfigString = new String();
+
 
 		public InetAddress getIPv4FromIFaceName(String name) throws SocketException{
         		Enumeration<NetworkInterface> interfaces;
@@ -695,99 +678,46 @@ public class DataLogger
 
 		CoXmlHandler(CanOpenThread cot)
 		{
+			super("/");
 			this.cot = cot;
 		}
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
 		{
-			if(qName.equalsIgnoreCase("can_driver")) {
-				bDriver = true;
-			}
-			else if(qName.equalsIgnoreCase("canopen_address")) {
-				bCanAddr = true;
-			}
-			else if(qName.equalsIgnoreCase("channels")) {
-				bChannels = true;
-			}
-			else if(qName.equalsIgnoreCase("stream")){
-				bStream = true;
-			}
-			else if(qName.equalsIgnoreCase("controller")){
-				bController=true;
-			}
-			else if(bDriver)
+			if(qName.equalsIgnoreCase("simulator")) 
 			{
-				if(qName.equalsIgnoreCase("type")) {
-					bType = true;
-				}
-				else if(qName.equalsIgnoreCase("address")) {
-					bAddress = true;
-				}
-				else if(qName.equalsIgnoreCase("port")) {
-					bPort = true;
-				}
+				child = new Simulator("simulator");				
 			}
-			else if(bChannels)
-			{
-				if(bNode)
-				{
-					if(qName.equalsIgnoreCase("od_index")) {
-						bOdIndex = true;
-					}
-					else if(qName.equalsIgnoreCase("name")) {
-						bName = true;
-					}
-					else if(qName.equalsIgnoreCase("cobid")) {
-						bCobid = true;
-					}
-					else if(qName.equalsIgnoreCase("num_samples")) {
-						bNumSamples = true;
-					}
-					else if(qName.equalsIgnoreCase("bits_sample")) {
-						bBitsSample = true;
-					}
-				}
-				else if(qName.equalsIgnoreCase("node")) {
-					bNode = true;
-				}
-			}
-			else if(bStream)
-			{
-				if(qName.equalsIgnoreCase("address")){
-					bStreamAddress=true;
-				}
-				else if(qName.equalsIgnoreCase("port")){
-					bStreamPort=true;
-				}
-			}
-			else if(bController){
-				if(qName.equalsIgnoreCase("address")){
-					bControllerAddress = true;
-				}else if(qName.equalsIgnoreCase("port")){
-					bControllerPort = true;
-				}else if(qName.equalsIgnoreCase("busmasterport")){
-					bBusMasterPort=true;
-				}
-			}
-
+			currConfigString = new String();
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException
 		{
-			if (qName.equalsIgnoreCase("can_driver"))
+			if(qName.equalsIgnoreCase("verbose")) {
+				GlobalVars.DEBUG = true;
+			}
+			else if(qName.equalsIgnoreCase("type")) {
+				type = currConfigString;
+			}
+			else if(qName.equalsIgnoreCase("address")) {
+				ipAddress = currConfigString;
+			}
+			else if(qName.equalsIgnoreCase("port")) {
+				port = currConfigString;
+			}
+			else if (qName.equalsIgnoreCase("can_driver"))
 			{
-				bDriver = false;
 				debugPrint("type: ("+type+")  addr: ("+ipAddress+") port: ("+port+")");
 				int p = Integer.decode(port);
 				cot.dm = new DriverManager(type, ipAddress, p, false);
 				cot.drvr = cot.dm.getDriver();
 				debugPrint("CANbus driver configured");
-
 			}
+
 			else if(qName.equalsIgnoreCase("canopen_address")) {
-				bCanAddr = false;
+				canAddr = currConfigString;
 				int iAddr = Integer.decode(canAddr);
 				debugPrint("canopen addr: ("+canAddr+")"+"  val:"+iAddr);
 				cot.od = DefaultOD.create(iAddr);
@@ -796,14 +726,14 @@ public class DataLogger
 
 				canOpen = new CanOpen(cot.drvr, cot.od, iAddr, GlobalVars.DEBUG);
 			}
-			else if(qName.equalsIgnoreCase("channels")) {
-				bChannels = false;
+			else if(qName.equalsIgnoreCase("busmasterport")) {
+				busMasterPort = currConfigString;
 			}
+
 			else if(qName.equalsIgnoreCase("stream"))
 			{
-				bStream = false;
 				try{
-					StringTokenizer st = new StringTokenizer(streamAddress, ",");
+					StringTokenizer st = new StringTokenizer(ipAddress, ",");
 					while (st.hasMoreTokens())
 					{
 						String t2 = st.nextToken();
@@ -815,7 +745,7 @@ public class DataLogger
 						System.out.println("Stream Using "+i1.getHostAddress());
 						try
 						{
-							StreamServer streamServer = new StreamServer(i1,Integer.decode(streamPort));
+							StreamServer streamServer = new StreamServer(i1,Integer.decode(port));
 							streamServer.start();
 							streamServers.add(streamServer);
 						}
@@ -831,9 +761,8 @@ public class DataLogger
 				}
 			}
 			else if(qName.equalsIgnoreCase("controller")){
-				bController = false;
 				try{
-					StringTokenizer st = new StringTokenizer(controllerAddress, ",");
+					StringTokenizer st = new StringTokenizer(ipAddress, ",");
 					while (st.hasMoreTokens())
                                         {
 						String t2 = st.nextToken();
@@ -845,7 +774,7 @@ public class DataLogger
 						try
 						{
 							controller.setBusMasterPort(Integer.decode(busMasterPort));
-							controllerServer = new ControllerServer(i1,Integer.decode(controllerPort),controller);
+							controllerServer = new ControllerServer(i1,Integer.decode(port),controller);
 							controllerServer.start();
 							controller.setSampleRate(50); //default. possible make this configurable in the future
 						}
@@ -860,114 +789,46 @@ public class DataLogger
 					e.printStackTrace();
 				}
 			}
-			else if(bDriver)
-			{
-				if(qName.equalsIgnoreCase("type")) {
-					bType = false;
-				}
-				else if(qName.equalsIgnoreCase("address")) {
-					bAddress = false;
-				}
-				else if(qName.equalsIgnoreCase("port")) {
-					bPort = false;
-				}
-			}
-			else if(bChannels)
-			{
-				if(bNode)
-				{
 
-					if(qName.equalsIgnoreCase("od_index")) {
-						bOdIndex = false;
-					}
-					else if(qName.equalsIgnoreCase("cobid")) {
-						bCobid = false;
-					}
-					else if(qName.equalsIgnoreCase("name")) {
-						bName = false;
-					}
-					else if(qName.equalsIgnoreCase("num_samples")) {
-						bNumSamples = false;
-					}
-					else if(qName.equalsIgnoreCase("bits_sample")) {
-						bBitsSample = false;
-					}
-					else if(qName.equalsIgnoreCase("node")) {
-						bNode = false;
-						int cobId = Integer.decode(cobid);
-						int bits = Integer.decode(bitsSample);
-						int iOdIndex = Integer.decode(odIndex);
-
-						debugPrint("node parameters odIndex:("+odIndex+ ") cobid:("+cobid+ ") numSamples:("+ numSamples +") bits per sample:("+ bitsSample+")");
-
-						NodeTracker possibleNode = new NodeTracker(canOpen, sName, cobId, cobId - 0x180, iOdIndex, 0x3, bits, 0,1,2);
-						//for(int i = 0; i < 10; i++) possibleNode.getLatestReading();
-						//if (possibleNode.getLatestReading().getX() != 0){
-							//nodes.add( new NodeTracker(canOpen, sName, cobId, rxPdoCtlMapIndex++, iOdIndex, 0x3, bits, 0,1,2));
-							nodes.add(possibleNode);
-							//nodes.add( new NodeTracker(canOpen, sName, cobId, iOdIndex, iOdIndex, 0x3, bits, 0,1,2));
-						//}
-					}
-				}
-				else if(qName.equalsIgnoreCase("channels")) {
-					bChannels = false;
-				}
+			else if(qName.equalsIgnoreCase("name")) {
+				sName = currConfigString;
 			}
-			else if(bStream)
-			{
-				if(qName.equalsIgnoreCase("address")){
-					bStreamAddress = false;
-				}
-				else if(qName.equalsIgnoreCase("port")){
-					bStreamPort = false;
-				}	
+			else if(qName.equalsIgnoreCase("od_index")) {
+				odIndex = currConfigString;
 			}
-			else if(bController){
-				if(qName.equalsIgnoreCase("address")){
-					bControllerAddress = false;
-				}else if(qName.equalsIgnoreCase("port")){
-					bControllerPort = false;
-				}else if(qName.equalsIgnoreCase("busmasterport")){
-					bBusMasterPort = false;
-				}
+			else if(qName.equalsIgnoreCase("cobid")) {
+				cobid = currConfigString;
+			}
+			else if(qName.equalsIgnoreCase("num_samples")) {
+				numSamples = currConfigString;
+			}
+			else if(qName.equalsIgnoreCase("bits_sample")) {
+				bitsSample = currConfigString;
+			}
+			else if(qName.equalsIgnoreCase("node")) {
+				int cobId = Integer.decode(cobid);
+				int bits = Integer.decode(bitsSample);
+				int iOdIndex = Integer.decode(odIndex);
+
+				debugPrint("node parameters odIndex:("+odIndex+ ") cobid:("+cobid+ ") numSamples:("+ numSamples +") bits per sample:("+ bitsSample+")");
+
+				NodeTracker possibleNode = new NodeTracker(canOpen, sName, cobId, cobId - 0x180, iOdIndex, 0x3, bits, 0,1,2);
+				//for(int i = 0; i < 10; i++) possibleNode.getLatestReading();
+				//if (possibleNode.getLatestReading().getX() != 0){
+				//nodes.add( new NodeTracker(canOpen, sName, cobId, rxPdoCtlMapIndex++, iOdIndex, 0x3, bits, 0,1,2));
+				nodes.add(possibleNode);
+				//nodes.add( new NodeTracker(canOpen, sName, cobId, iOdIndex, iOdIndex, 0x3, bits, 0,1,2));
+				//}
 			}
 		}
+
 
 		@Override
 		public void characters(char ch[], int start, int length) throws SAXException
 		{
 			String temp = new String(ch, start, length).trim();
-			if(temp.length() == 0)
-				return;
+			currConfigString += temp;
 
-			if(bType)
-				type = temp;
-			else if(bAddress)
-				ipAddress = temp;
-			else if(bPort)
-				port = temp;
-			else if(bCanAddr)
-				canAddr = temp;
-			else if(bOdIndex)
-				odIndex = temp;
-			else if(bCobid)
-				cobid = temp;
-			else if(bName)
-				sName = temp;
-			else if(bNumSamples)
-				numSamples = temp;
-			else if(bBitsSample)
-				bitsSample = temp;
-			else if(bStreamAddress)
-				streamAddress = temp;
-			else if(bStreamPort)
-				streamPort = temp;
-			else if(bControllerAddress)
-				controllerAddress = temp;
-			else if(bControllerPort)
-				controllerPort = temp;	
-			else if(bBusMasterPort)
-				busMasterPort = temp;
 		}
 	}	// end private class CoXmlHandler
 

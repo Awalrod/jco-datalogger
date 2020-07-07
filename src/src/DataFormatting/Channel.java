@@ -13,20 +13,21 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.time.*;
 import java.util.*;
 
-public class Simulator extends NestedHandler
-{
-	List<Channel> clist;
-	Channel currChannel;
 
-	public Simulator(String name)
+public class Channel extends NestedHandler
+{
+	List<Signal> slist;
+	Signal currSignal;
+
+	public Channel(String name)
 	{
 		super(name);
-		clist = new ArrayList<Channel>();
+		slist = new ArrayList<Signal>();
 	}
-
-	public Simulator()
+	
+	public Channel()
 	{
-		this("simulator");
+		this("channel");
 	}
 	
 	@Override
@@ -34,9 +35,11 @@ public class Simulator extends NestedHandler
 	{
 		super.startElement(uri, localName, qName, attributes);		
 		
-		if(qName.equalsIgnoreCase("channel")) {
-			currChannel = new Channel();
-			child = currChannel;
+		if(qName.equalsIgnoreCase("signal")) {
+			String type = attributes.getValue("type");
+			System.out.println("signal type: "+type);
+			currSignal = new Sinusoid("sin");
+			child = currSignal;
 		}
 	}
 
@@ -45,7 +48,7 @@ public class Simulator extends NestedHandler
 	{
 		if (qName.equalsIgnoreCase("channel"))
 		{
-			clist.add(currChannel);
+			slist.add(currSignal);
 			child = null;
 		}
 		else

@@ -32,18 +32,7 @@ abstract class Signal extends NestedHandler
 		jitter = 0.0;
 //             System.out.println(nodeName);
 	}
-	
-/*	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
-	{
-		super.startElement(uri, localName, qName, attributes);		
-		
-		if(qName.equalsIgnoreCase("can_driver")) {
-		}
-		else if(qName.equalsIgnoreCase("canopen_address")) {
-		}
-	}
-*/
+
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{

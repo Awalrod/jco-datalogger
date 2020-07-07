@@ -17,50 +17,60 @@ import java.util.*;
 public class Channel extends NestedHandler
 {
 	List<Signal> slist;
-	Signal currSignal;
+	String chName;
+	double val;
 
 	public Channel(String name)
 	{
 		super(name);
 		slist = new ArrayList<Signal>();
 //		System.out.println("new " + nodeName);
+		chName = "default";
 	}
-	
+
 	public Channel()
 	{
 		this("channel");
 	}
-	
+
+	public void evaluate(Instant t)
+        {
+/*        	Double dVal = new Double(0.0);
+                slist.forEach( n -> dVal.sum(dVal.doubleValue(), n.evaluate(t)) );
+                val = dVal.doubleValue();
+*/
+		val = 0.0;
+		Iterator<Signal> is = slist.iterator();
+		while(is.hasNext())
+		{
+			val+= is.next().evaluate(t);
+		}
+                System.out.println("ch: "+chName+" val:"+val);
+        }
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
 	{
-		super.startElement(uri, localName, qName, attributes);		
-		
+		super.startElement(uri, localName, qName, attributes);
+
 		if(qName.equalsIgnoreCase("signal")) {
+			Signal currSignal;
 			String type = attributes.getValue("type");
-//	System.out.println("signal type: "+type);
 			currSignal = new Sinusoid("signal");
 			child = currSignal;
+			slist.add(currSignal);
 		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
-//		if (qName.equalsIgnoreCase("channel"))
-//		{
-//			slist.add(currSignal);
-//			child = null;
-//		}
-//		else
-//		{
-//			super.endElement(uri, localName, qName);
-//		}
-//		nodeString = new String();
-//		System.out.println(nodeName +" end element: "+ qName);
 		super.endElement(uri, localName, qName);
-		if(child == null)
-			slist.add(currSignal);
+		if(qName.equalsIgnoreCase("name"))
+                {
+                        chName = new String(nodeString);
+                }
+
 
 	}
 }

@@ -39,15 +39,19 @@ public class CoSimulator implements CanOpenListener
 	private DataFormatter dfmt;
 	long elapsedTimeNs = 0;
 	DateTime startInstant;
+	Simulator simulator;
 
-	public CoSimulator(CanOpen canOpen)
+	public CoSimulator(CanOpen canOpen, Simulator simulator)
 	{
+System.out.println("new CoSimulator");
 		this.canOpen = canOpen;
+		this.simulator = simulator;
 	}
 	
 	//Adds Self to the Canopen instance's list of sync listeners
 	public void startSyncListener()
 	{
+System.out.println("simulator adding listener");
 		canOpen.addSyncListener(this);
 		startInstant = DateTime.now();
 	}
@@ -55,6 +59,7 @@ public class CoSimulator implements CanOpenListener
 	//Removes self from the Canopen instance's list of sync listeners
 	public void stopSyncListener()
 	{
+System.out.println("simulator removing listener");
 		canOpen.removeSyncListener(this);
 	}
 
@@ -65,7 +70,8 @@ public class CoSimulator implements CanOpenListener
 	public void onMessage(CanMessage canMessage)
 	{
 //			long nanoStart = System.nanoTime();
-		System.out.println("SYNC message received in simulator");
+//		System.out.println("SYNC message received in simulator");
+		simulator.evaluate(canMessage.getInstant());
 	}
 
 	public void onObjDictChange(SubEntry se)

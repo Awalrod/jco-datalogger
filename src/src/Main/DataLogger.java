@@ -81,6 +81,7 @@ import org.xml.sax.SAXException;
 //import org.xml.sax.helpers.DefaultHandler;
 import DataFormatting.NestedHandler;
 import DataFormatting.Simulator;
+import DataFormatting.CoSimulator;
 
 import java.time.*;
 
@@ -92,6 +93,7 @@ public class DataLogger
 {
 	private CanOpen canOpen;
 	public COListener coListener;
+	public CoSimulator coSim;
 	private CanOpenThread coThread;
 
 	private ArrayList<NodeTracker> nodes;
@@ -150,9 +152,13 @@ public class DataLogger
 	//Hopefully these will become unneccessary
 	public void startSyncListener(){
 		coListener.startSyncListener();
+		if(coSim !=null)
+			coSim.startSyncListener();
 	}
 	public void stopSyncListener(){
 		coListener.stopSyncListener();
+		if(coSim != null)
+			coSim.stopSyncListener();
 	}
 	public String detailedFileList(){
 		return fileHandler.detailedFileList();
@@ -293,7 +299,10 @@ public class DataLogger
 //				System.out.println("need to potentially start recording on this event");
 				if(startImmediately)
 				{
-					startSyncListener(); }
+					startSyncListener(); 
+					if(coSim != null)
+						coSim.startSyncListener();
+				}
 			}
 		}
 	}
@@ -336,11 +345,16 @@ public class DataLogger
 		{
 			canOpen.addSyncListener(this);
 			debugPrint("Starting Sync Listener for Stream");
+			if(coSim != null)
+			 	coSim.startSyncListener();
+
 			
 		}
 		public void stopSyncListener()
 		{
 			canOpen.removeSyncListener(this);
+			if(coSim != null)
+			 	coSim.stopSyncListener();
 		}
 	}
 	
@@ -643,6 +657,7 @@ public class DataLogger
 		String controllerAddress;
 		String controllerPort;
 		String busMasterPort;
+		Simulator simulator = null;
 //		String nodeString = new String();
 
 
@@ -687,7 +702,8 @@ public class DataLogger
 		{
 			if(qName.equalsIgnoreCase("simulator")) 
 			{
-				child = new Simulator("simulator");				
+				simulator = new Simulator("simulator");
+				child = simulator;
 			}
 			super.startElement(uri, localName, qName, attributes);
 			nodeString = new String();
@@ -859,6 +875,11 @@ public class DataLogger
 				canOpen.addEventListener(coListener);
 				constantListener = new ConstantListener();
 
+				if(handler.simulator != null)
+				{
+					coSim = new CoSimulator(canOpen, handler.simulator);
+					
+				}
 				debugPrint("CanOpen configured");
 			}
 			catch(ParserConfigurationException pce)
@@ -894,6 +915,8 @@ public class DataLogger
 					if(startImmediately)
 					{
 						coListener.startSyncListener();
+						if(coSim != null)
+							coSim.startSyncListener();
 					}
 					constantListener.startSyncListener();
 					canOpen.join(1000);
@@ -1070,6 +1093,9 @@ System.out.println("CanOpenThread shutdown complete");
 		System.out.println("stream servers stopped");
 		
 		coListener.stopSyncListener();
+		if(coSim != null)
+			coSim.stopSyncListener();
+
 	}
 
 

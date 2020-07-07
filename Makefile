@@ -1,5 +1,5 @@
 PACK = jcodatalogger
-VERSION = 1.1
+VERSION = 1.2
 TARGET = $(PACK)-$(VERSION)
 SRC = ./src
 CONFIG_LOC =  etc/gcdc
@@ -32,7 +32,7 @@ install: $(steps) package
 	#REQUIRES SUDO
 	#run this first if changes were made that need to be implemented
 	#moves working code to install locations
-	sudo dpkg -i $(PACK)_$(VERSION)_all.deb
+	sudo dpkg -i $(PACK)_$(VERSION)_armf.deb
 	
 uninstall:
 	sudo dpkg -r $(PACK)

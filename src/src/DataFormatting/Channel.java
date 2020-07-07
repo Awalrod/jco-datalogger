@@ -71,7 +71,14 @@ public class Channel extends NestedHandler
 		if(qName.equalsIgnoreCase("signal")) {
 			Signal currSignal;
 			String type = attributes.getValue("type");
-			currSignal = new Sinusoid("signal");
+
+			if(type.equalsIgnoreCase("sin"))
+				currSignal = new Sinusoid("signal");
+			else if(type.equalsIgnoreCase("random"))
+				currSignal = new RandomSignal("signal");
+			else
+				currSignal = new Sinusoid("signal");
+			
 			child = currSignal;
 			slist.add(currSignal);
 		}

@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
+<!--	<verbose/> -->
 	<can_driver>
 		<type>datagram</type>
 		<address>localhost</address>
 		<port>2000</port>
 	</can_driver>
 	<canopen_address>0x23</canopen_address>
+	<simulator>
+		<channel>
+			<signal type="sin">
+				<frequency>4</frequency>
+				<amplitude>100</amplitude>
+			</signal>
+		</channel>
+	</simulator>
 	<channels>
 		<node>
 			<name>N2_</name>

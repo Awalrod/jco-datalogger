@@ -32,7 +32,7 @@ install: $(steps) package
 	#REQUIRES SUDO
 	#run this first if changes were made that need to be implemented
 	#moves working code to install locations
-	sudo dpkg -i $(PACK)_$(VERSION)_armf.deb
+	sudo dpkg -i $(PACK)_$(VERSION)_armhf.deb
 	
 uninstall:
 	sudo dpkg -r $(PACK)

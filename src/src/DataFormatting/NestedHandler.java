@@ -48,15 +48,20 @@ public class NestedHandler extends DefaultHandler
     {
         if(child == null)
         {
+//            System.out.println(nodeName +" endElement: "+ qName);
             if(qName.equals(nodeName))
             {
+//                System.out.println("deactiviating");
                 isActive = false;
             }
             return;
         }
+//        System.out.println(nodeName +" endElement for child: "+ qName);
+
         child.endElement(uri, localName, qName);
         if(!child.isNodeActive())
         {
+//            System.out.println(child.nodeName +" removed on: "+ qName);
             child = null;
         }
     }

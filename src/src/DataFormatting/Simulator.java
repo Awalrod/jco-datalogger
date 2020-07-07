@@ -22,6 +22,7 @@ public class Simulator extends NestedHandler
 	{
 		super(name);
 		clist = new ArrayList<Channel>();
+//		System.out.println("new "+nodeName);
 	}
 
 	public Simulator()
@@ -33,6 +34,7 @@ public class Simulator extends NestedHandler
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
 	{
 		super.startElement(uri, localName, qName, attributes);		
+//		System.out.println(nodeName +" start element: "+ qName);
 		
 		if(qName.equalsIgnoreCase("channel")) {
 			currChannel = new Channel();
@@ -43,15 +45,17 @@ public class Simulator extends NestedHandler
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
-		if (qName.equalsIgnoreCase("channel"))
-		{
-			clist.add(currChannel);
-			child = null;
-		}
-		else
-		{
+//		if (qName.equalsIgnoreCase("channel"))
+//		{
+//			clist.add(currChannel);
+//			child = null;
+//		}
+//		else
+//		{
+//		System.out.println(nodeName +" end element: "+ qName);
 			super.endElement(uri, localName, qName);
-		}
-		nodeString = new String();
+			if(child == null)
+				clist.add(currChannel);
+//		}
 	}
 }

@@ -23,6 +23,7 @@ public class Channel extends NestedHandler
 	{
 		super(name);
 		slist = new ArrayList<Signal>();
+//		System.out.println("new " + nodeName);
 	}
 	
 	public Channel()
@@ -37,8 +38,8 @@ public class Channel extends NestedHandler
 		
 		if(qName.equalsIgnoreCase("signal")) {
 			String type = attributes.getValue("type");
-			System.out.println("signal type: "+type);
-			currSignal = new Sinusoid("sin");
+//	System.out.println("signal type: "+type);
+			currSignal = new Sinusoid("signal");
 			child = currSignal;
 		}
 	}
@@ -46,15 +47,20 @@ public class Channel extends NestedHandler
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
-		if (qName.equalsIgnoreCase("channel"))
-		{
+//		if (qName.equalsIgnoreCase("channel"))
+//		{
+//			slist.add(currSignal);
+//			child = null;
+//		}
+//		else
+//		{
+//			super.endElement(uri, localName, qName);
+//		}
+//		nodeString = new String();
+//		System.out.println(nodeName +" end element: "+ qName);
+		super.endElement(uri, localName, qName);
+		if(child == null)
 			slist.add(currSignal);
-			child = null;
-		}
-		else
-		{
-			super.endElement(uri, localName, qName);
-		}
-		nodeString = new String();
+
 	}
 }

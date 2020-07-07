@@ -10,7 +10,7 @@
 	<simulator>
 		<channel>
 			<signal type="sin">
-				<frequency>4</frequency>
+				<freq>4</freq>
 				<amplitude>100</amplitude>
 			</signal>
 		</channel>

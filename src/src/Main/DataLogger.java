@@ -643,7 +643,7 @@ public class DataLogger
 		String controllerAddress;
 		String controllerPort;
 		String busMasterPort;
-		String currConfigString = new String();
+//		String nodeString = new String();
 
 
 		public InetAddress getIPv4FromIFaceName(String name) throws SocketException{
@@ -689,7 +689,8 @@ public class DataLogger
 			{
 				child = new Simulator("simulator");				
 			}
-			currConfigString = new String();
+			super.startElement(uri, localName, qName, attributes);
+			nodeString = new String();
 		}
 
 		@Override
@@ -699,13 +700,13 @@ public class DataLogger
 				GlobalVars.DEBUG = true;
 			}
 			else if(qName.equalsIgnoreCase("type")) {
-				type = currConfigString;
+				type = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("address")) {
-				ipAddress = currConfigString;
+				ipAddress = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("port")) {
-				port = currConfigString;
+				port = nodeString;
 			}
 			else if (qName.equalsIgnoreCase("can_driver"))
 			{
@@ -717,7 +718,7 @@ public class DataLogger
 			}
 
 			else if(qName.equalsIgnoreCase("canopen_address")) {
-				canAddr = currConfigString;
+				canAddr = nodeString;
 				int iAddr = Integer.decode(canAddr);
 				debugPrint("canopen addr: ("+canAddr+")"+"  val:"+iAddr);
 				cot.od = DefaultOD.create(iAddr);
@@ -727,7 +728,7 @@ public class DataLogger
 				canOpen = new CanOpen(cot.drvr, cot.od, iAddr, GlobalVars.DEBUG);
 			}
 			else if(qName.equalsIgnoreCase("busmasterport")) {
-				busMasterPort = currConfigString;
+				busMasterPort = nodeString;
 			}
 
 			else if(qName.equalsIgnoreCase("stream"))
@@ -791,19 +792,19 @@ public class DataLogger
 			}
 
 			else if(qName.equalsIgnoreCase("name")) {
-				sName = currConfigString;
+				sName = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("od_index")) {
-				odIndex = currConfigString;
+				odIndex = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("cobid")) {
-				cobid = currConfigString;
+				cobid = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("num_samples")) {
-				numSamples = currConfigString;
+				numSamples = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("bits_sample")) {
-				bitsSample = currConfigString;
+				bitsSample = nodeString;
 			}
 			else if(qName.equalsIgnoreCase("node")) {
 				int cobId = Integer.decode(cobid);
@@ -820,16 +821,17 @@ public class DataLogger
 				//nodes.add( new NodeTracker(canOpen, sName, cobId, iOdIndex, iOdIndex, 0x3, bits, 0,1,2));
 				//}
 			}
+			super.endElement(uri, localName, qName);
 		}
 
 
-		@Override
-		public void characters(char ch[], int start, int length) throws SAXException
-		{
-			String temp = new String(ch, start, length).trim();
-			currConfigString += temp;
-
-		}
+//		@Override
+//		public void characters(char ch[], int start, int length) throws SAXException
+//		{
+//			String temp = new String(ch, start, length).trim();
+//			nodeString += temp;
+//
+//		}
 	}	// end private class CoXmlHandler
 
 
@@ -1017,7 +1019,7 @@ System.out.println("CanOpenThread shutdown complete");
 			}
 			catch( Exception e)
 			{
-				System.out.println("Can't use default object dictionary entries anymore");
+				System.out.println("Can't use default object dictionary entries anymore\n"+e);
 				System.exit(-2);
 			}
 

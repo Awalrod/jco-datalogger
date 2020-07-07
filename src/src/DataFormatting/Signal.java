@@ -30,6 +30,7 @@ abstract class Signal extends NestedHandler
 		amplitude = 0.0;
 		offset = 0.0;
 		jitter = 0.0;
+//             System.out.println(nodeName);
 	}
 	
 /*	@Override
@@ -46,7 +47,8 @@ abstract class Signal extends NestedHandler
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
-		if (qName.equalsIgnoreCase("freq"))
+//             System.out.println(nodeName +" end element: "+ qName +"  ("+nodeString+")");
+		if( qName.equalsIgnoreCase("freq"))
 		{
 			freq = Double.parseDouble(nodeString);
 		}

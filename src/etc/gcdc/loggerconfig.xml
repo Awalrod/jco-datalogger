@@ -8,29 +8,33 @@
 	</can_driver>
 	<canopen_address>0x23</canopen_address>
 	<simulator>
+		<name>8</name>
 		<channel>
 			<name>x</name>
 			<signal type="sin">
-				<freq>4</freq>
-				<amplitude>100</amplitude>
+				<freq>4.7391</freq>
+				<amplitude>300</amplitude>
+				<offset>1000</offset>
 			</signal>
 			<signal type="sin">
-				<freq>8</freq>
-				<amplitude>100</amplitude>
+				<freq>9.4782</freq>
+				<amplitude>300</amplitude>
 			</signal>
 		</channel>
 		<channel>
 			<name>y</name>
 			<signal type="sin">
-				<freq>24</freq>
+				<freq>24.179</freq>
 				<amplitude>300</amplitude>
+				<offset>500</offset>
 			</signal>
 		</channel>
 		<channel>
 			<name>z</name>
 			<signal type="sin">
-				<freq>1</freq>
-				<amplitude>500</amplitude>
+				<freq>0.967166</freq>
+				<amplitude>300</amplitude>
+				<offset>0</offset>
 			</signal>
 		</channel>
 	</simulator>

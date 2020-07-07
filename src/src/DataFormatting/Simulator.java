@@ -12,16 +12,19 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.time.*;
 import java.util.*;
+import DataRecording.AccelerometerReading;
 
 public class Simulator extends NestedHandler
 {
 	List<Channel> clist;
+	String nodeName;
 
 	public Simulator(String name)
 	{
 		super(name);
 		clist = new ArrayList<Channel>();
 //		System.out.println("new "+nodeName);
+		nodeName = "9";
 	}
 
 	public Simulator()
@@ -32,6 +35,33 @@ public class Simulator extends NestedHandler
 	public void evaluate(Instant t)
 	{
 		clist.forEach(n -> n.evaluate(t));
+	}
+	
+	public AccelerometerReading getAccel()
+	{
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		Iterator<Channel> iter = clist.iterator();
+		while(iter.hasNext())
+		{
+			Channel ch = iter.next();
+			if(ch.nameEquals("x"))
+			{
+				x = ch.getIntValue();
+			}
+			else if(ch.nameEquals("y"))
+			{
+				y = ch.getIntValue();
+			}
+			else if(ch.nameEquals("z"))
+			{
+				z = ch.getIntValue();
+			}
+		}
+		AccelerometerReading ar = new AccelerometerReading(x, y, z);
+		ar.setID(nodeName);
+		return(ar);
 	}
 	
 	@Override
@@ -51,11 +81,10 @@ public class Simulator extends NestedHandler
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
-//		if (qName.equalsIgnoreCase("channel"))
-//		{
-//			clist.add(currChannel);
-//			child = null;
-//		}
+		if (qName.equalsIgnoreCase("name"))
+		{
+			nodeName = new String(nodeString);
+		}
 //		else
 //		{
 //		System.out.println(nodeName +" end element: "+ qName);

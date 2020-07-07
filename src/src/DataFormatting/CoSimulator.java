@@ -43,7 +43,6 @@ public class CoSimulator implements CanOpenListener
 
 	public CoSimulator(CanOpen canOpen, Simulator simulator)
 	{
-System.out.println("new CoSimulator");
 		this.canOpen = canOpen;
 		this.simulator = simulator;
 	}
@@ -51,7 +50,6 @@ System.out.println("new CoSimulator");
 	//Adds Self to the Canopen instance's list of sync listeners
 	public void startSyncListener()
 	{
-System.out.println("simulator adding listener");
 		canOpen.addSyncListener(this);
 		startInstant = DateTime.now();
 	}
@@ -59,7 +57,6 @@ System.out.println("simulator adding listener");
 	//Removes self from the Canopen instance's list of sync listeners
 	public void stopSyncListener()
 	{
-System.out.println("simulator removing listener");
 		canOpen.removeSyncListener(this);
 	}
 
@@ -76,6 +73,11 @@ System.out.println("simulator removing listener");
 
 	public void onObjDictChange(SubEntry se)
 	{
+	}
+
+	public AccelerometerReading getAccel()
+	{
+		return(simulator.getAccel());
 	}
 
 	/**

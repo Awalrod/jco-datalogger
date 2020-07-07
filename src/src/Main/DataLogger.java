@@ -313,7 +313,7 @@ public class DataLogger
 	{
 	
 		public void onMessage(CanMessage canMessage){
-			AccelerometerReading readings[] = new AccelerometerReading[nodes.size()];
+			AccelerometerReading readings[] = new AccelerometerReading[nodes.size()+1];
 			int j=0;
 			for(int i=0; i<nodes.size(); i++ )
 			{
@@ -321,6 +321,11 @@ public class DataLogger
 				AccelerometerReading ar = nodes.get(i).getLatestReading();
                                 if(ar != null)
                                 	readings[j++] = ar;
+			}
+			if(coSim != null)
+			{
+				AccelerometerReading ar = coSim.getAccel();
+				readings[j++] = ar;
 			}
 			//debugPrint(dfmt.produceJsonString(readings));
 			Iterator<StreamServer> ss = streamServers.iterator();

@@ -18,7 +18,7 @@ public class Channel extends NestedHandler
 {
 	List<Signal> slist;
 	String chName;
-	double val;
+	private double val;
 
 	public Channel(String name)
 	{
@@ -31,6 +31,21 @@ public class Channel extends NestedHandler
 	public Channel()
 	{
 		this("channel");
+	}
+	
+	public double getValue()
+	{
+		return(val);
+	}
+
+	public int getIntValue()
+	{
+		return((int)(val+0.5));
+	}
+	
+	public boolean nameEquals(String name)
+	{
+		return( chName.equalsIgnoreCase(name));
 	}
 
 	public void evaluate(Instant t)
@@ -45,7 +60,7 @@ public class Channel extends NestedHandler
 		{
 			val+= is.next().evaluate(t);
 		}
-                System.out.println("ch: "+chName+" val:"+val);
+//                System.out.println("ch: "+chName+" val:"+val);
         }
 
 	@Override

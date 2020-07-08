@@ -12,29 +12,33 @@
 		<channel>
 			<name>x</name>
 			<signal type="sin">
-				<freq>4.7391</freq>
-				<amplitude>300</amplitude>
+				<freq>4.6423</freq>
+				<amplitude>1000</amplitude>
 				<offset>1000</offset>
 			</signal>
 			<signal type="sin">
-				<freq>9.4782</freq>
-				<amplitude>300</amplitude>
+				<freq>9.2848</freq>
+				<amplitude>1000</amplitude>
 			</signal>
 		</channel>
 		<channel>
 			<name>y</name>
 			<signal type="sin">
 				<freq>24.179</freq>
-				<amplitude>300</amplitude>
+				<amplitude>1000</amplitude>
 				<offset>500</offset>
 			</signal>
 		</channel>
 		<channel>
 			<name>z</name>
 			<signal type="sin">
-				<freq>0.967166</freq>
-				<amplitude>300</amplitude>
+				<freq>1.934</freq>
+				<amplitude>1000</amplitude>
 				<offset>0</offset>
+			</signal>
+			<signal type="randomflat">
+				<freq>512.0</freq>
+				<amplitude>10</amplitude>
 			</signal>
 		</channel>
 	</simulator>

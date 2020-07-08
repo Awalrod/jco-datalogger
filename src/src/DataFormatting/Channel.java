@@ -76,6 +76,8 @@ public class Channel extends NestedHandler
 				currSignal = new Sinusoid("signal");
 			else if(type.equalsIgnoreCase("random"))
 				currSignal = new RandomSignal("signal");
+			else if(type.equalsIgnoreCase("randomflat"))
+				currSignal = new RandFlatSignal("signal");
 			else
 				currSignal = new Sinusoid("signal");
 			

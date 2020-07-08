@@ -3,14 +3,16 @@ package DataFormatting;
 
 import java.time.*;
 import java.math.*;
+import java.util.Random;
 
-public class Sinusoid extends Signal
+public class RandomSignal extends Signal
 {
-	double rmsToPeak;
-	public Sinusoid(String name)
+	Random rand;
+	
+	public RandomSignal(String name)
 	{
 		super(name);
-		rmsToPeak = Math.sqrt(2.0);
+		rand = new Random();	
 	}
 
 	public double evaluate(Instant t)
@@ -24,7 +26,7 @@ public class Sinusoid extends Signal
 		double td = (double)t.getEpochSecond() + ((double)t.getNano()/1e9);
 //System.out.println("t:"+td);
 
-		double retval = offset + rmsToPeak*amplitude* Math.sin( 2.0*Math.PI*freq*(td-t0) + phase);
+		double retval = offset + amplitude* rand.nextGaussian();
 		return(retval);
 	}
 

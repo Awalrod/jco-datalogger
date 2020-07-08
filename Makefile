@@ -1,6 +1,5 @@
 PACK = jcodatalogger
-VERSION = 1.2
-TARGET = $(PACK)-$(VERSION)
+VERSION = 1.1
 SRC = ./src
 CONFIG_LOC =  etc/gcdc
 INIT_LOC = etc/init.d
@@ -10,10 +9,10 @@ JAR_LOC = usr/local/share/java
 ICON_LOC = usr/share/apache2/icons
 #WEB_LOC = var/www/html
 steps = config init jar
-TMP_DIR=$(TARGET)_temp
+TMP_DIR=$(PACK)-temp
 
 package: $(steps)  
-#	dpkg -b $(TARGET)
+#	dpkg -b $(PACK)
 	@dpkg-deb --build $(TMP_DIR) .
 
 
@@ -32,11 +31,10 @@ install: $(steps) package
 	#REQUIRES SUDO
 	#run this first if changes were made that need to be implemented
 	#moves working code to install locations
-	sudo dpkg -i $(PACK)_$(VERSION)_armf.deb
-	
+	sudo dpkg -i $(PACK)__armhf.deb
+
 uninstall:
 	sudo dpkg -r $(PACK)
 
 clean:
 	rm -rf $(TMP_DIR)
-

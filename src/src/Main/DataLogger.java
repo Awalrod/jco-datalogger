@@ -79,7 +79,8 @@ import java.io.File;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 //import org.xml.sax.helpers.DefaultHandler;
-import DataFormatting.NestedHandler;
+import com.gcdc.sax.NestedHandler;
+
 import DataFormatting.Simulator;
 import DataFormatting.CoSimulator;
 

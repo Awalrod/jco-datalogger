@@ -1116,15 +1116,15 @@ System.out.println("CanOpenThread shutdown complete");
 		long secs = i1.getEpochSecond();
 		long nano = i1.getNano();
 		double dtime = secs+ (double)nano/1e9;
-		System.out.println("startTime: "+i1);
-		System.out.println("dtime    : "+dtime);
+//		System.out.println("startTime: "+i1);
+//		System.out.println("dtime    : "+dtime);
 
 		Instant i2 = Instant.now();
 		 secs = i2.getEpochSecond();
 		nano = i2.getNano();
-		System.out.println("startTime: "+i2);
+//		System.out.println("startTime: "+i2);
 		dtime = secs+ (double)nano/1e9;
-		System.out.println("dtime    : "+dtime);
+//		System.out.println("dtime    : "+dtime);
 
 		final DataLogger dl = new DataLogger(args);
 		Runtime.getRuntime().addShutdownHook(new Thread()

@@ -23,6 +23,7 @@ abstract class Signal extends NestedHandler
 	double t0;
 	double offset;
 	double jitter;
+	double phase;
 
 	public Signal(String name)
 	{
@@ -37,7 +38,8 @@ abstract class Signal extends NestedHandler
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
-//             System.out.println(nodeName +" end element: "+ qName +"  ("+nodeString+")");
+//             System.out.println(nodeName +" end element: "+ qName +"  ("+nodeString+") numattr:"+currentAttributes.getLength() );
+             	
 		if( qName.equalsIgnoreCase("freq"))
 		{
 			freq = Double.parseDouble(nodeString);
@@ -45,6 +47,21 @@ abstract class Signal extends NestedHandler
 		else if(qName.equalsIgnoreCase("amplitude"))
 		{
 			amplitude = Double.parseDouble(nodeString);
+			String sUnits = currentAttributes.getValue("units");
+			if(sUnits !=null )
+			{	// a units modifier was found in the attributes section of this element
+				if(sUnits.equalsIgnoreCase("rms"))
+				{
+					amplitude = Math.sqrt(2.0) * amplitude;
+
+				}
+				if(sUnits.equalsIgnoreCase("db"))
+				{
+					double db = amplitude;
+					db = db/20.0;
+					amplitude =  Math.sqrt(2.0) * Math.pow(10.0,db);
+				}
+			}
 		}
 		else if(qName.equalsIgnoreCase("t0"))
 		{
@@ -57,6 +74,24 @@ abstract class Signal extends NestedHandler
 		else if(qName.equalsIgnoreCase("jitter"))
 		{
 			jitter = Double.parseDouble(nodeString);
+		}
+		else if(qName.equalsIgnoreCase("phase"))
+		{
+			phase = Double.parseDouble(nodeString);
+			String sUnits = currentAttributes.getValue("units");
+			if(sUnits !=null )
+			{	// a units modifier was found in the attributes section of this element
+				if(sUnits.equalsIgnoreCase("deg"))
+				{
+					phase = phase* Math.PI/180.0;
+
+				}
+				else if(sUnits.equalsIgnoreCase("grad"))
+				{
+					phase = phase* Math.PI/200.0;
+				}
+			}
+			
 		}
 		else
 		{

@@ -8,37 +8,53 @@
 	</can_driver>
 	<canopen_address>0x23</canopen_address>
 	<simulator>
-		<name>8</name>
+		<name>9</name>
 		<channel>
 			<name>x</name>
 			<signal type="sin">
 				<freq>4.6423</freq>
-				<amplitude>1000</amplitude>
+				<amplitude units="rms">1000</amplitude>
 				<offset>1000</offset>
 			</signal>
-			<signal type="sin">
+			<signal type="sin" >
 				<freq>9.2848</freq>
-				<amplitude>1000</amplitude>
+				<amplitude units="rms">1000</amplitude>
 			</signal>
 		</channel>
 		<channel>
 			<name>y</name>
 			<signal type="sin">
-				<freq>24.179</freq>
-				<amplitude>1000</amplitude>
+				<freq>4.6423</freq>
+				<amplitude units="dB">20</amplitude>
+				<offset>1000</offset>
+			</signal>
+			<signal type="sin" >
+				<freq>9.2848</freq>
+				<amplitude units="dB">15</amplitude>
+				<phase units="deg">90.0</phase>
+			</signal>
+			<signal type="sin" >
+				<freq>18.57</freq>
+				<amplitude units="dB">12</amplitude>
 				<offset>500</offset>
 			</signal>
+			<signal type="randomflat">
+				<freq>1024.0</freq>
+				<amplitude  units="db">10</amplitude>
+				<phase units="deg">180.0</phase>
+			</signal>
+
 		</channel>
 		<channel>
 			<name>z</name>
 			<signal type="sin">
 				<freq>1.934</freq>
-				<amplitude>1000</amplitude>
+				<amplitude units="rms">1000</amplitude>
 				<offset>0</offset>
 			</signal>
 			<signal type="randomflat">
 				<freq>512.0</freq>
-				<amplitude>10</amplitude>
+				<amplitude  units="db">10</amplitude>
 			</signal>
 		</channel>
 	</simulator>

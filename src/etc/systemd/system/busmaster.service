@@ -6,7 +6,7 @@ Before=jcodatalogger.service
 [Service]
 User=root
 Group=root
-ExecStart=/usr/local/bin/DS401_Master -i0x66 -x /etc/gcdc/busmaster-config.xml -d
+ExecStart=/usr/local/bin/MqttCoBusMaster -i0x66 -x /etc/gcdc/busmaster-config.xml -d
 Type=notify
 Restart=always
 RestartSec=5

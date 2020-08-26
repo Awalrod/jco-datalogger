@@ -5,6 +5,15 @@
 		<interface>can0</interface>
 		<baud>500K</baud>
 	</can_fest>
+	<mqtt>
+		<broker>	
+			<clientEndpoint>tcp://li554-27.members.linode.com:1883</clientEndpoint>
+			<clientID>unused</clientID>
+			<certificateFile>not used</certificateFile>
+			<privateKeyFile>not used</privateKeyFile>
+			<userId>B1_TEST_TOKEN</userId>
+		</broker>
+	</mqtt>
 	<slave_nodes>
 		<node id="a2"><name>device 2</name><nodeid>0x02</nodeid>
 			<pdo type="tx" num="1">
@@ -41,11 +50,14 @@
 			        <map><index>0x2000</index><subindex>3</subindex><num_bits>20</num_bits></map> 
 			</pdo_map>
 		</node>
-
-		<node id="a5"><name>device 5</name><nodeid>0x05</nodeid>
+		<node id="a5">
+			<name>device 5</name>
+			<nodeid>0x05</nodeid>
 			<pdo type="tx" num="1">
 				<cobid>0x185</cobid>
-				<transmission_type>1</transmission_type><inhibit_time></inhibit_time><event_timer>0</event_timer>
+				<transmission_type>1</transmission_type>
+				<inhibit_time></inhibit_time>
+				<event_timer>0</event_timer>
 			</pdo> 
 			<pdo_map type="tx" num="1">
 				<map><index>0x2000</index><subindex>1</subindex><num_bits>20</num_bits></map> 
@@ -143,10 +155,11 @@
 			<obj_dict><index>0x6202</index><subindex>1</subindex><type>int8</type>
 				<val>0x12</val>
 			</obj_dict>
-			<obj_dict><index>0x1016</index><subindex>2</subindex><type>int32</type>
+			<obj_dict scope="private"><index>0x1016</index><subindex>2</subindex><type>int32</type>
 				<val>0x12345678</val>
 			</obj_dict>
 			<obj_dict><index>0x1006</index><subindex>0</subindex><type>int32</type>
+				<alias>sample_interval_us</alias>
 				<val>500000</val>
 			</obj_dict>
 <!--			<obj_dict><index>0x1008</index><subindex>0</subindex><type>visible_string</type>
